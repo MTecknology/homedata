@@ -1,0 +1,95 @@
+# SALT BUG: https://github.com/saltstack/salt/issues/55790
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ salt-minion\[[[:digit:]]+\]: .*DeprecationWarning.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ salt-minion\[[[:digit:]]+\]: .*(get_function_argspec|from collections).*$
+
+# FERM
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ferm\[[0-9]+\]: Starting Firewall: ferm.
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ferm\[[0-9]+\]: Stopping Firewall: ferm.
+
+# INIT
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ init: Trying to re-exec init$
+
+# KERNEL
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ kernel: \[[0-9\.]+\] audit: .*apparmor="STATUS".*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ kernel: \[[0-9\.]+\] kauditd_printk_skb: [[:digit:]]+ callbacks suppressed$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ kernel: \[[0-9\.]+\] \[drm\].*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ kernel: \[[0-9\.]+\] radeon.*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[._[:alnum:]-]+\] audit:.*DENIED.*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: audit:.*apparmor="DENIED".*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: .* entered forwarding state$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: .* (entered|left) (disabled|promiscuous) (mode|state)$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: IPv6: ADDRCONF.*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[._[:alnum:]-]+\] IPv6: ADDRCONF.*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[._[:alnum:]-]+\] eth.*renamed from.*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: .* kvm: zapping shadow pages for mmio generation wraparound$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: .* perf interrupt took too long .*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel:.*took too long.*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[.[:alnum:]]+\] vmbr[0-9]+: port.*entered blocking state$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[.[:alnum:]]+\] hpet:.*$
+
+# DBUS
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ dbus\[[[:digit:]]+\]: \[system\].*$
+
+# DHCLIENT
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ dhclient\[[[:digit:]]+\] DHCPREQUEST for .*$
+
+# MDADM
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[[:digit:]\.]+\] md:.*data-check done.$
+
+# MSMTP
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ msmtp: .* exitcode=EX_OK$
+
+# NTP
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd\[[0-9]+\]: adjusting local clock by [0-9\.]+s*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[[[:digit:]\.]+\] hpet1: lost [[:digit:]]+ rtc interrupts$
+
+# OPENVPN
+#^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ ovpn-do_[[:digit:]]+\[[[:digit:]]+\]: oob.*$
+#^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ ovpn-inferno\[[[:digit:]]+\]: NOTE: .*$
+#^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ ovpn-inferno\[[[:digit:]]+\]: UDPv4 link remote: .*$
+#^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ ovpn-inferno\[[[:digit:]]+\]: /sbin/ip .*$
+#^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ ovpn-inferno\[[[:digit:]]+\]: do_ifconfig, .*$
+#^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ ovpn-inferno\[[[:digit:]]+\]: /etc/openvpn/update-resolv-conf .*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ ovpn-inferno\[[[:digit:]]+\]: .*$
+
+# RSYSLOG
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ rsyslogd-2007: action.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ rsyslogd-2359: action.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ rsyslogd0: action.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ (liblogging-stdlog|rsyslogd): .*rsyslogd was HUPed$
+
+# SALT
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ salt-minion\[[[:digit:]]+\]: stdin: is not a tty$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ salt-minion\[[[:digit:]]+\]: mesg: ttyname failed: Inappropriate ioctl for device$
+
+# SSH
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Received signal 15; terminating.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: error: PAM: Cannot make/remove an entry for the specified session.*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshd\[[[:digit:]]+\]: Disconnected from user.*$
+
+# SSHGUARD
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshguard\[[[:digit:]]+\]: Started successfully.*now ready to scan\.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sshguard\[[[:digit:]]+\]: Reloading rotated file.*$
+
+# SU
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ su\[[0-9]+\]: pam_unix\(su:session\): session (opened|closed) for user.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ su: pam_unix\(su-l:session\): session (opened|closed) for user.*$
+
+# SYSTEMDIPSHIT
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ systemd\[[0-9]+\]:.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ systemd: pam_unix.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ .*pam_systemd.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ systemd-logind\[[0-9]+\]:.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ systemd-timesyncd[[0-9]+\]:.*$
+
+# PROXMOX
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ pve.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ rrdcached[[0-9]+\]:.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ spiceproxy[[0-9]+\]:.*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ pmxcfs[[0-9]+\]: \[dcdb\] notice: data verification successful$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ pmxcfs[[0-9]+\]: \[status\] notice: received log$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ vzdump[[0-9]+\]: INFO: .*$
+
+# UNBOUND
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ unbound: \[[:0-9]+\] info: .*$
+^\w{3} [ :0-9]{11} [._[:alnum:]-]+ unbound: \[[:0-9]+\] notice: .*$

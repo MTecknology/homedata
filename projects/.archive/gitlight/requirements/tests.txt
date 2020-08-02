@@ -1,0 +1,6 @@
+-r base.txt
+codacy-coverage
+misspellings
+pytest
+pytest-cov
+pylint

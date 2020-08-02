@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+'''
+A friend of mine created this version. It's slower (2x), but more pythonic.
+A 25% gain was seen by using my file write function; although, that function could be improved.
+'''
+import collections
+import itertools
+import sys
+
+
+#delims = (' ', '\n', '\t')
+delims = (32, 10, 9)
+
+
+def strcspn(haystack, needles):
+    return len(list(itertools.takewhile(lambda x: x not in needles, haystack)))
+
+
+def partition(haystack, needles):
+    index = strcspn(haystack, needles)
+    return (haystack[:index], haystack[index:index+1], haystack[index+1:])
+
+
+def flush(path, index, queue):
+    with open(f'{path}/out.{index}', 'wb') as file:
+        file.write(b''.join(queue))
+
+
+def main(argv):
+    queue = collections.deque()
+    length = 0
+    outfileindex = 0
+    with open(argv[1], 'rb') as infile:
+        for line in infile:
+            left, delim, rest = partition(line, delims)
+            while True:
+                for item in (left, delim):
+                    if length + len(item) > 100:
+                        flush(argv[2], outfileindex, queue)
+                        queue.clear()
+                        length = 0
+                        outfileindex += 1
+                    queue.append(item)
+                    length += len(item)
+                if rest:
+                    left, delim, rest = partition(rest, delims)
+                else:
+                    break
+    flush(argv[2], outfileindex, queue)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) == 3:
+        main(sys.argv)
+    else:
+        print(f'Usage: {sys.argv[0]} <infile> <outpath>')

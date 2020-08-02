@@ -1,0 +1,5 @@
+This module worked similar to pillar.get() except that it was designed to
+operate on a shared pillar dictionary. It was rewritten because the old
+version had many bugs and broke the standard assumptions. This temporary
+module was eventually deprecated in favor of a system that doesn't use
+shared dictionaries.

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+##
+# Build documentation stubs for gitlight.
+##
+DOCS_DIR="$(dirname $0)"
+REFS=('libs' 'mods' 'routes')
+
+die() {
+	[[ "$@" ]] && printf '*** %s ***\n' "$@"
+	popd
+	exit 1
+}
+
+main() {
+	pushd "$DOCS_DIR" || die 'Could not open docs directory'
+	clean_dirs || die 'Unable to prepare stub creation.'
+	gen_stubs || die 'Could not build documentation stubs'
+	popd
+}
+
+clean_dirs() {
+	for ref in ${REFS[@]}; do
+		rm -f  "ref/$ref"/*
+		mkdir -p "ref/$ref"
+	done
+}
+
+gen_stubs() {
+	for ref in ${REFS[@]}; do
+		for fname in "../gitlight/$ref"/*.py; do
+			pyname="$(basename "$fname")"
+			gen_stub "$ref" "${pyname%.*}" || return 1
+		done
+	done
+}
+
+gen_stub() {
+	local ref="$1"
+	local mod="$2"
+
+	cat >"ref/$ref/gitlight.$ref.$mod.rst" <<-EOF
+	$mod
+	$(for _ in $(seq 1 ${#mod}); do printf '='; done)
+
+	.. automodule:: gitlight.$ref.$mod
+	    :members:
+	EOF
+}
+
+main

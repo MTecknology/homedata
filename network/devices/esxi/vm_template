@@ -1,0 +1,66 @@
+New Template
+============
+
+- New VM:
+
+  Name: TEMPLATE.lustfield.net
+  Guest Family: Linux
+  OS Version: Latest Debian 64-bit
+  CPU: 2
+  Mem: 2G
+  HD: 16G
+  Net: 3_Guest
+  CD: ISO/Debion
+
+- Boot to Debian ISO
+
+TODO: TURN THIS INTO A PRESEED FILE
+
+- Advanced > Expert install
+
+  + Accept defaults, except:
+
+    ^ Hostname: TEMPLATE
+    ^ Domain: lustfield.net
+    ^ Root Pass: $firstPassEver
+    ^ User: Michael [...]
+    ^ NTP: 10.41.7.1
+    ^ TZ: Central
+    ^ Manual Partition::
+
+        /dev/sda  [msdos]
+             sda1 [lvm]
+
+        lvm [name:sys]:
+            root  5G    ext4  /         3%
+            home  100M  ext4  /home     0%
+            boot  1G    ext2  /boot     2%
+            var   1G    ext4  /var      5%
+            log   1G    ext4  /var/log  5%
+            opt   1G    ext4  /opt      1%
+            srv   1G    ext4  /srv      1%
+
+    ^ initrd: targeted
+    ^ tasksel: de-select all
+    ^ Execute shell:
+
+        apt install vim wget openssh-server open-vm-tools screen rsync
+        apt purge vim-tiny nano systemd
+        apt install sysvinit-core
+        apt purge dbun 'libdbus*'
+        mkdir /root/.ssh
+        wget https://p.lustfield.net/mteck.pub -O /root/.ssh/authorized_keys
+        chmod 700 /root/.ssh
+        chmod 600 /root/.ssh/authorized_keys
+        echo 'PermitRootLogin without-password' >>/etc/ssh/ssh_config
+        echo 'AllowGroups ssh-user' >>/etc/ssh/ssh_config
+        groupadd -g 990 ssh-user
+        usermod -a -G ssh-user michael
+        vim /etc/gai.conf
+
+  + Let proceed as usual
+  + DO NOT reboot into new system
+- Upgrade VM Compatibility
+- Turn into Template
+
+  + Export > OVF

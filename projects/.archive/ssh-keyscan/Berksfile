@@ -1,0 +1,4 @@
+source 'https://supermarket.chef.io'
+
+cookbook 'keyscan_test', path: 'test/fixtures/cookbooks/keyscan_test'
+cookbook 'testing_utils', path: File.expand_path('~/testing-utils/cookbooks/testing_utils')

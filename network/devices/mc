@@ -1,0 +1,26 @@
+Minecraft
+=========
+
+Follow: esxi/vm_template (for mc.lustfield.net)
++ /opt -> 20G
+
+Create: /usr/local/sbin/msm
+Create: /etc/init.d/{msm,bungee}
+update-rc.d {bungee,msm} defaults
+
+apt install git default-jre
+apt purge dbus
+
+git clone https://github.com/msmhq/msm.git /opt/msm-repo
+
+crontab -e::
+
+    # msm-backup
+    0 5 * * * /usr/local/sbin/msm all worlds backup >/dev/null
+    # msm-logroll
+    0 3 * * * /usr/local/sbin/msm all logroll >/dev/null
+    # msm-backup-cleanup
+    0 5 * * * find /opt/msm/archives -type f -mtime +2 -name '*.zip' -o -name '*.gz' -delete
+
+groupadd -g 1011 msm
+useradd -s /bin/dash -u 1011 -g 1011 -d /opt/msm msm

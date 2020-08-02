@@ -1,0 +1,263 @@
+First install w/ debian stable
+/dev/sda
+   : 1M
+  1: 512M   ; EFI
+  2: 2G     ; /boot ; ext2 ; 2%
+  3: LUKS [ LVM ]
+     - home ; 50G  ; ext4 ; 0% ; /home
+     - opt  ; 100G ; xfs  ; -- ; /opt
+     - root ; 10G  ; ext4 ; 2% ; /
+     - var  ; 2G   ; ext4 ; 5% ; /var
+     - log  ; 2G   ; ext4 ; 5% ; /var/log
+Boot to debian testing installer
+- w/ iwlwifi driver on vfat partition
+- chroot into /target
+- /etc/apt/apt.conf.d/extra-installs::
+
+    APT::Install-Recommends "false";
+    APT::Install-Suggests "false";
+
+- apt purge systemd; apt install sysvinit-core
+
+- /etc/apt/sources.list::
+
+    deb http://deb.debian.org/debian/ buster main contrib non-free
+    deb http://security.debian.org/debian-security buster/updates main contrib non-free
+    deb http://deb.debian.org/debian/ buster-updates main contrib non-free
+
+    deb http://deb.debian.org/debian testing main contrib contrib non-free
+    deb http://deb.debian.org/debian unstable main contrib contrib non-free
+    deb http://deb.debian.org/debian experimental main contrib contrib non-free
+
+    deb http://deb.debian.org/debian buster-backports main contrib contrib non-free
+
+- /etc/apt/preferences.d/pinning::
+
+    Package: *
+    Pin: release a=stable
+    Pin-Priority: 900
+
+    Package: *
+    Pin: release a=testing
+    Pin-Priority: 800
+
+    Package: *
+    Pin: release a=unstable
+    Pin-Priority: 700
+
+    Package: *
+    Pin: release a=experimental
+    Pin-Priority: 600
+
+# TODO:
+# Random crap that needs to be cleaned up...
+# - Built dummy dbus-user-session package to install openrazer-daemon
+# - GPU Rendering did not work until added to the 'render' group.
+# - Installed razergenie/polychromatic from upstream (need to purge)
+
+- apt update
+
+- apt purge \
+    tasksel
+    tasksel-data
+    installation-report
+    vim-tiny
+    nano
+
+- apt install -t buster-backports \
+    linux-image-amd64
+    linux-headers-amd64
+    firmware-misc-nonfree
+
+- apt install -t testing \
+    xserver-xorg
+    nvidia-driver
+    libinput
+
+- apt install \
+    acpi
+    acpid
+    slim
+    terminator
+    xterm
+    rxvt
+    xserver-xorg
+    xserver-xorg-video-intel
+    wicd-curses
+    firefox-esr
+    claws-mail
+    claws-mail-pgpinline
+    claws-mail-pgpmime
+    claws-mail-multi-notifier
+    gnupg2
+    pinentry-gtk2
+    virtualbox-guest-x11
+    virtualbox-guest-additions-iso
+    virtualbox-qt
+    virtualbox
+    vim
+    xserver-xorg-video-intel
+    xfonts-scalable
+    xfonts-cyrillic
+    xfonts-75dpi
+    xfonts-100dpi
+    xfonts-base
+    xfonts-utils
+    x11-utils
+    xutils
+    xinput
+    dbus-x11
+    chrony
+    ferm
+    openvpn
+    openssh-client
+    hicolor-icon-theme
+    less
+    whiptail
+    zathura
+    feh
+    unzip
+    mbuffer
+    usbutils
+    dosfstools
+    genisoimage
+    wodim
+    keepassxc
+    gnupg-agent
+    iamerican
+    ibritish
+    wamerican
+    nullmailer
+    finger
+    dnsutils
+    mtr-tiny
+    telnet
+    whois
+    python3-pudb
+    usb-modeswitch
+    acpi
+    powertop
+    powermgmt-base
+    git
+    git-remote-gcrypt
+    restic
+    pavucontrol
+    pulseaudio
+    mpv
+    wcalc
+    gstreamer1.0-plugins-base
+    gstreamer1.0-plugins-good
+    curl
+    rsync
+    default-jre
+    mesa-utils
+    linux-firmware-nonfree
+    redshift-gtk
+    sudo
+    zenity
+    yubikey-personalization
+    yubikey-personalization-gui
+    barrier
+    gimp
+    hdparm
+    vagrant
+    suckless-tools
+    cbatticon
+    inkscape
+    hugin
+    default-jre openjdk-11-jre default-jre icedtea-netx \
+    nmap
+    wireshark
+    devscripts
+    dput
+    dput-ng
+    debian-keyring
+    xsane
+    cups
+    system-config-printer
+    \
+    openbox
+    stalonetray
+    tdc
+    gmrun
+    \
+    glx-alternatives-nvidia
+    nvidia-persistenced
+    nvidia-settings
+    \
+    hugin
+    gimp
+    libreoffice
+    chromium
+    chromium-sandbox
+
+apt install build-essential
+apt install --reinstall nvidia-kernel-dkms
+# MAKE SURE THIS COMPILES
+
+- /etc/X11/xorg.conf.d/nvidia.conf::
+
+    Section "ServerLayout"
+        Identifier "layout"
+        Option "AllowNVIDIAGPUScreens"
+    EndSection
+
+- /etc/modules::
+
+    nvidia-current
+    nvidia-current-drm
+    nvidia-current-modeset
+
+- /etc/sudoers.d/michael::
+
+    michael ALL=(root:root) NOPASSWD:/sbin/shutdown,/sbin/cryptsetup,/bin/mount,/bin/umount,/usr/bin/ykchalresp
+
+- Set up /root/.ovpn
+
+- mkdir /etc/polkit-1/rules.d
+- /etc/polkit-1/rules.d/10-enable-suspend.rules::
+
+    polkit.addRule(function(action, subject) {
+        if (action.id == "org.freedesktop.login1.suspend" ||
+            action.id == "org.freedesktop.login1.suspend-multiple-sessions" ||
+            action.id == "org.freedesktop.login1.hibernate" ||
+            action.id == "org.freedesktop.login1.hibernate-multiple-sessions")
+        {
+            return polkit.Result.YES;
+        }
+    });
+
+- /usr/local/sbin/gpurun [755]::
+
+    #!/bin/dash
+    __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=NVIDIA-G0 "$@"
+
+- gsettings set org.mate.session.required-components windowmanager compiz
+
+
+Laser Printer / Scanner
+-----------------------
+
+- system-config-printer::
+
+  ipp://print.lustfield.net:631/ipp
+  "Brother HL-4070CDW Foomatic/pxlcolor"
+
+- dpkg -i ~/repos/data/network/printer/brscan4-*.deb
+- brsaneconfig4 -a name=Scanner model=HL-L3290CDW ip=10.41.3.80
+
+Issues
+------
+
+- https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=898267
+  + can just copy/paste bin file
+  + May also be worthwhile just watching the bug and updating whenever
+  + Fixed?..
+- Need "xserver-xorg -version" >= 1.20.6
+  + Currently have 1.20.4
+  + ? https://packages.debian.org/unstable/xserver-xorg-core
+
+References
+----------
+
+- http://download.nvidia.com/XFree86/Linux-x86_64/440.59/README/primerenderoffload.html

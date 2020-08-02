@@ -1,0 +1,16 @@
+[general]
+profile = 
+integration = true
+
+[kde_session]
+backend = ini
+profile = 
+integration = true
+plugin_list_autosort = true
+
+[mate_session]
+backend = ini
+profile = 
+integration = true
+plugin_list_autosort = true
+

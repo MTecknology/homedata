@@ -1,0 +1,3 @@
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ sh\[[0-9]+\]: Connection to [\.0-9]+ closed by remote host.$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ mono\[[[:digit:]]+\]: \[Info\].*$
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ jackett\[[[:digit:]]+\]: \[Info\].*$

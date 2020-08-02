@@ -1,0 +1,10 @@
+DEPENDENCIES
+  keyscan_test
+    path: test/fixtures/cookbooks/keyscan_test
+  testing_utils
+    path: ../../testing-utils/cookbooks/testing_utils
+
+GRAPH
+  keyscan_test (0.1.0)
+    testing_utils (>= 1.0)
+  testing_utils (1.0.0)

@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+'''
+GitLight Command Line Utility
+'''
+
+
+def main():
+    '''
+    Main GitLight Handler
+    '''
+    pass
+
+
+if __name__ == '__main__':
+    main()

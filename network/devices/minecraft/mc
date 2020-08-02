@@ -1,0 +1,30 @@
+09:24 <+nbastin> once you get to around 12gb you can really tweak the GC
+09:24 <+Bumbu> I could, but it hasn't come close to approaching it's limit
+09:24 <+nbastin> well mostly the trick is just to tweak the GC to keep everything collected out of old generation
+09:24 <+nbastin> but 8gb is usually not enough to make that work
+09:25 <+nbastin> I'm only using 12g right now, maybe should bump up - 10G is enough for good gc though
+09:25 <+nbastin> something like:
+09:25 <+nbastin> java -Xms12G -Xmx12G -XX\:+UseG1GC -XX\:+UnlockExperimentalVMOptions -XX\:MaxGCPauseMillis=50 -XX\:+DisableExplicitGC -XX\:TargetSurvivorRatio=90 -XX\:G1NewSizePercent=50 -XX\:G1MaxNewSizePercent=80
+                 -XX\:InitiatingHeapOccupancyPercent=10 -XX\:G1MixedGCLiveThresholdPercent=50 -XX\:+AggressiveOpts -XX\:+AlwaysPreTouch -XX\:+UseLargePagesInMetaspace -jar paperclip-209.jar nogui
+09:26 <+nbastin> 12G is probably not enough for us, 10G is probably fine for most
+09:27 <+nbastin> if you go too low then your mix of GC params needs to change, because you can starve out your live pools
+09:27 < MiniDigger> if you want a somewhat understandable explanation of these flags (instead of just copy pasting something) read this post https://aikar.co/2018/07/02/tuning-the-jvm-g1gc-garbage-collector-flags-for-minecraft/
+
+
+09:57 < MiniDigger> for porting, bungee brings some simple commands, but ideally you want to have a portal plugin
+09:57 < MiniDigger> https://docs.velocitypowered.com/en/latest/users/getting-started.html
+09:57 <+nbastin> oh there we go, it's behind how to install
+
+
+10:08 < MiniDigger> for bungee and stuff its important to get some settings right about forwarding UUIDs and IPs to backend servers and securing your backend servers
+10:08 < MiniDigger> https://www.spigotmc.org/wiki/bungeecord-installation/#post-installation
+
+
+03:07 <+nbastin> most of them don't change performance that much, but there are a few important ones
+03:08 <+nbastin> max-auto-save-chunks-per-tick, for sure
+03:09 <+nbastin> also there are some you can mess with that have pretty significant impact but change (if only subtly) the behaviour
+03:09 <+nbastin> like grass-spread-tick-rate
+03:09 <+nbastin> max-entity-collisions is good if you have chicken cookers and similar packed areas
+03:11 <+nbastin> if you are not using plugins that hook into hoppers, you really really want to set hopper.disable-move-event to true
+03:11 <+nbastin> that is a big one, esp. as you get more hoppers
+03:12 <+nbastin> also use-faster-eigencraft-redstone, we are using this and it works fine, and is much faster

@@ -1,0 +1,157 @@
+Release TDC Version
+-------------------
+
+# https://wiki.debian.org/Creating%20signed%20GitHub%20releases
+vim <files> # update version number
+git tag -s v1.5 # Releasing version 1.5.
+git push --tags
+wget https://github.com/MTecknology/tdc/archive/v1.5.tar.gz
+gpg --armor --detach-sign v1.5.tar.gz
+Navigate to: https://github.com/MTecknology/tdc/releases
+  "Draft a new release"
+Add .asc file
+Rename file to tdc-1.5.tar.gz.asc
+
+
+
+Release Nginx Version
+---------------------
+
+PKT=(experimental|testing|jessie|buster)
+
+# release - part 1 (forge)
+
+git pull
+build-unstable
+# test built packages
+lintian-check ../nginx_1.11.7-1~exp2_amd64.changes
+
+dch -e # s/UNRELEASED/$PKT/
+#DIST=$PKT ARCH=amd64 gbp buildpackage --git-pbuilder -uc -us -S -sa
+DIST=$PKT ARCH=amd64 gbp buildpackage --git-pbuilder --git-pbuilder-options=--source-only-changes
+#    ^ never build for upload with experimental; use unstable
+
+# release - part 2 (laptop)
+
+mkdir build; cd build
+scp forge:maint/nginx*.{dsc,changes,orig.tar.gz,build,tar.xz,deb,buildinfo} ./
+debsign -k 765AD085 *.changes
+dput *.changes
+
+# releas - part 3 (forge)
+
+rm debian/files
+# wait for ACCEPTED email from ftpmasters
+gbp buildpackage --git-tag --git-tag-only --git-debian-branch=experimental
+git push --tags
+
+
+
+Using Quilt
+-----------
+
+create patch:
+
+    quilt push -a
+    quilt new <name>.patch
+    quilt add <file>
+    vim <file>
+    quilt header -e
+    quilt refresh
+    quilt pop -a
+
+
+
+Using Lintain
+-------------
+
+check package:
+
+    lintian-check ../tdc_1.4-1_amd64.changes
+
+
+
+Building Notes
+--------------
+
+build and test a package:
+
+    cd collab-maint/nginx
+    build-unstable
+    lintian-check ../*.changes
+
+
+clean dir:
+
+    rm *.{deb,build,changes,dsc,buildinfo,xz}
+
+
+CATS Notes
+----------
+
+CATS (check-all-the-things) is an incredibly massive tool that catches a rather
+crazy amount of stuff.
+
+
+
+Working w/ Git
+--------------
+
+track all remote branches:
+
+    git branch -r | sed 's/.*\///' | xargs -I B git branch -f B origin/B
+
+track down a commit:
+
+    gitk # interactive X utility
+
+    git branch --contains 42bae8bb1399ce53d74cd30a775071210ab0736e
+    git log --merges 2ed82d0bb9414103871918aee83e745c71e81d93
+    git reflog show --all | grep 45c71e81d93
+    git log 42bae8b
+
+purge modifications after build:
+
+    git reset --hard
+    git clean -fd
+
+
+When upstream publishes a new release:
+
+    gbp import-orig --pristine-tar --uscan
+    # or
+    wget https://github.com/MTecknology/tdc/archive/v1.5.tar.gz -O ../tdc-v1.5.tar.gz
+    gbp import-orig --sign-tags --upstream-version=1.5 ../tdc-v1.5.tar.gz
+
+
+When playing with local changes:
+
+    git-buildpackage --git-ignore-new
+
+
+
+Working w/ Github
+-----------------
+
+Creating a new tag creates a new release file.
+
+Sign the release with:
+
+    gpg --armor --detach-sign tdc-1.4.tar.gz
+
+
+Packaging Gitea
+---------------
+
+mkdir -p ~/go/src/code.gitea.io/
+git clone gitea ~/go/src/code.gitea.io/gitea
+cd ~/go/src/code.gitea.io/gitea
+govendor list
+
+Packaging Golang Library
+------------------------
+
+dh-make-golang -type library gopkg.in/gomail.v2
+
+
+

@@ -1,0 +1,239 @@
+Plex
+====
+
+Follow: esxi/vm_template (for wlc.lustfield.net)
+
+Extra disk (sdb1 vg:misc)
+- media   /srv/media       xfs  500G
+- docker  /var/lib/docker  xfs  10G
+
+Grab images
+-----------
+
+apt install docker.io
+
+for image in plex radarr sonarr jackett sabnzbd qbittorrent; do
+	docker pull "linuxserver/$image"
+done
+
+Downloaders
+-----------
+
+docker create \
+    --name=qbittorrent \
+    --hostname=qbittorrent \
+    --net media_network \
+    -e PUID=2001 \
+    -e PGID=2001 \
+    -e TZ=America/Central \
+    -p 8080:8080 \
+    -p 6881:6881 \
+    -p 6881:6881/udp \
+    -v /srv/media/qbittorrent/config:/config \
+    -v /srv/media/qbittorrent/downloads:/downloads \
+    -v /srv/media/sonarr/downloads:/downloads/sonarr \
+    -v /srv/media/radarr/downloads:/downloads/radarr \
+    --restart unless-stopped \
+    linuxserver/qbittorrent
+docker start qbittorrent
+
+http://media.lustfield.net:8080:
+- Options:
+  + Downloads:
+    * Saving Management:
+      ^ Mode: Automatic
+      ^ On changes: Relocate
+      ^ Keep incomplete: checked, /downloads/incomplete/
+    * Run external program:
+	/config/scripts/download-complete-handler "%L" "%F" "%D"
+  + Connection:
+    * Proto: TCP
+  + Bittorrent:
+    * DHT: Unchecked
+    * PeX: Unchecked
+    * Discovery: Unchecked
+    * Encryption: Required
+    * Queue: 15/15/30
+    * Seed limit: 10080 minutes (7d)
+    * Remove torrent and files after limit
+  + WebUI:
+    * Language: English
+
+docker create \
+    --name=sabnzbd \
+    --hostname=sabnzbd \
+    --net media_network \
+    -e PUID=2001 \
+    -e PGID=2001 \
+    -e TZ=America/Central \
+    -p 8088:8080 \
+    -v /srv/media/sabnzbd/config:/config \
+    -v /srv/media/sabnzbd/downloads:/downloads \
+    -v /srv/media/sonarr/downloads:/downloads/sonarr \
+    -v /srv/media/radarr/downloads:/downloads/radarr \
+    --restart unless-stopped \
+    linuxserver/sabnzbd
+docker start sabnzbd
+
+- vim /srv/media/sabnzbd/config/sabnzbd.ini
+- host_whitelist = sabnzbd, media.lustfield.net
+- port = 8088
+- docker restart sabnzbd
+
+http://media.lustfield.net:8088:
+- Settings:
+  + Folders:
+    * Temporary: /downloads/.temp
+    * Complete: /downloads
+  + Categories:
+    & default, normal, +delete, nil, /downloads/complete
+    * sonarr, def, +delete, nil, /downloads/sonarr
+    * radarr, def, +delete, nil, /downloads/radarr
+
+Indexers
+--------
+
+docker create \
+    --name=jackett \
+    --hostname=jackett \
+    --net media_network \
+    -e PUID=2001 \
+    -e PGID=2001 \
+    -e TZ=America/Central \
+    -p 9117:9117 \
+    -v /srv/media/jackett/config:/config \
+    -v /srv/media/jackett/downloads:/downloads \
+    --restart unless-stopped \
+    linuxserver/jackett
+docker start jackett
+
+http://media.lustfield.net:9117/:
+- Add indexer: TorrentDay
+- Keep track of API Key
+
+Recorders
+---------
+    -v /srv/media/qbittorrent/downloads:/downloads \
+
+docker create \
+    --name=radarr \
+    --hostname=radarr \
+    --net media_network \
+    -e PUID=2001 \
+    -e PGID=2001 \
+    -e TZ=America/Central \
+    -p 7878:7878 \
+    -v /srv/media/radarr/config:/config \
+    -v /srv/media/radarr/downloads:/downloads \
+    -v /srv/media/movies:/movies \
+    --restart unless-stopped \
+    linuxserver/radarr
+docker start radarr
+
+http://media.lustfield.net:7878/:
+- Follow setup
+
+docker create \
+    --name=sonarr \
+    --hostname=sonarr \
+    --net media_network \
+    -e PUID=2001 \
+    -e PGID=2001 \
+    -e TZ=America/Central \
+    -p 8989:8989 \
+    -v /srv/media/sonarr/config:/config \
+    -v /srv/media/sonarr/downloads:/downloads \
+    -v /srv/media/shows:/tv \
+    --restart unless-stopped \
+    linuxserver/sonarr
+docker start sonarr
+
+http://media.lustfield.net:8989/:
+- Follow setup
+
+Setup
++++++
+
+- Media Management:
+  + Rename Movies: Yes
+  + Include Quality: Yes
+  + Replace Spaces: Yes
+  + Separator: Period
+  + Naming Formats: s/ /./ && _{Quality Full}
+- Quality:
+  + *:    <1  GB
+  + SDTV: 700 MB
+  + DVD:  1   GB
+  + 480p: 1.4 GB
+  + 576p: ^
+  + 720*: ^
+  + 1080: 2   GB
+  + 2160: 3   GB
+  + BR-D: 3.5 GB
+- Indexers:
+  + Jackett:
+    * Type: Torznab
+    * Name: Jackett
+    * URL: http://jackett:9117/api/v2.0/indexers/torrentday/results/torznab/
+    * API Key: From jackett
+  + NzbGeek:
+    * Type: Newznab
+    * name: NzbGeek
+- UI:
+  + Use sane date/time settings
+- Download Client:
+  + Redownload: No
+  + qBT:
+    * Host: qbittorrent
+    * Category: radarr|sonarr
+  + SABnzbd:
+    * Host: sabnzbd
+    * API Key: (from host)
+    * Category: radarr|sonarr
+
+Media Servers
+-------------
+
+# NOTE: 4-minut expiration on all codes
+https://www.plex.tv/claim/
+read -p 'Claim code: ' -s CLAIM_CODE
+Add for first plex startup:
+    -e PLEX_CLAIM=$CLAIM_CODE \
+
+docker create \
+    --name=plex \
+    --hostname=plex \
+    --net=media_network \
+    --device=/dev/dri:/dev/dri \
+    -e PUID=2001 \
+    -e PGID=2001 \
+    -e VERSION=docker \
+    -p 32400:32400 \
+    -p 32400:32400/udp \
+    -p 32469:32469 \
+    -p 32469:32469/udp \
+    -p 5353:5353/udp \
+    -p 1900:1900/udp \
+    -v /srv/media/plex:/config \
+    -v /srv/media/movies:/movies \
+    -v /srv/media/shows:/tv \
+    --restart unless-stopped \
+    linuxserver/plex
+docker start plex
+
+http://media.lustfield.net:32400/:
+- Settings > General:
+  + Name: MTNet
+  + Upload reports: Unchecked
+- Settings > Remote:
+  + Enable remote access
+  + Port: 32400
+  + Limit upload: 4MB
+- Settings > Library:
+  + Scan automatically: Checked
+  + Scan interval: Daily
+- Settings > Network:
+  + Enable GDM discovery: Unchecked
+- Settings > Transcoder:
+  + Quality: Prefer higher quality
+  + Use accelleration: Checked

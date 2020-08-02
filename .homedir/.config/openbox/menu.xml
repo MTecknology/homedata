@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openbox_menu>
+  <menu id="root-menu" label="OpenBox 3">
+    <menu id="1" label="Common">
+      <item label="Terminal">
+        <action name="Execute">
+          <execute>terminator -u</execute>
+        </action>
+      </item>
+      <item label="Web Browser">
+        <action name="Execute">
+          <execute>firefox</execute>
+        </action>
+      </item>
+      <item label="Email">
+        <action name="Execute">
+          <execute>claws-mail</execute>
+        </action>
+      </item>
+      <item label="Music">
+        <action name="Execute">
+          <execute>terminator -u -T music -x screen -aAdr -RR music -c ~/.config/music_screen</execute>
+        </action>
+      </item>
+      <item label="Irssi">
+        <action name="Execute">
+          <execute>terminator -u -m -b -T irssi -x ssh michael@irc.lustfield.net -t screen -aAdr -RR irssi irssi</execute>
+        </action>
+      </item>
+    </menu>
+    <menu id="2" label="Accessories">
+      <item label="Calculator">
+        <action name="Execute">
+          <execute>rxvt +sb -geometry 100x20+375+250 -e wcalc -EE</execute>
+        </action>
+      </item>
+      <item label="Screenshot">
+        <action name="Execute">
+          <execute>sleep 1 &amp;&amp; scrot</execute>
+        </action>
+      </item>
+    </menu>
+    <menu id="4" label="Multimedia">
+      <item label="Volume Mixer">
+        <action name="Execute">
+          <execute>pavucontrol</execute>
+        </action>
+      </item>
+    </menu>
+    <menu id="5" label="Network">
+      <item label="Claws Mail">
+        <action name="Execute">
+          <execute>claws-mail</execute>
+        </action>
+      </item>
+      <item label="Midori">
+        <action name="Execute">
+          <execute>firefox</execute>
+        </action>
+      </item>
+      <item label="Irssi">
+        <action name="Execute">
+          <execute>terminator -u -m -b -T irssi -x ssh michael@irc.lustfield.net -Xt screen -aAdr -RR irssi irssi</execute>
+        </action>
+      </item>
+    </menu>
+    <menu id="6" label="Office">
+      <item label="PDF Viewer">
+        <action name="Execute">
+          <execute>zathura</execute>
+        </action>
+      </item>
+    </menu>
+    <separator/>
+    <menu id="9" label="OpenBox">
+      <menu id="client-list-menu"/>
+      <item label="Reconfigure">
+        <action name="Reconfigure"/>
+      </item>
+      <item label="Restart">
+        <action name="Restart"/>
+      </item>
+      <item label="Logout">
+        <action name="Exit" />
+      </item>
+    </menu>
+  </menu>
+</openbox_menu>

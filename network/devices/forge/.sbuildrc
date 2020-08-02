@@ -1,0 +1,3 @@
+$build_arch_all = 1;
+$build_source = 1;
+$distribution = 'sid';

@@ -1,0 +1,24 @@
+ESXi Installation
+=================
+
+- Download ESXi
+- Set up HW-RAID
+- Install ESXi
+- Setup
+  + ConfigureNetwork Management
+    * Network Adapters: vmnic2 (tertiary card)
+    * IPv4: 10.41.7.4X/24
+    * IPv6: Disabled
+    * DNS: 10.41.7.1
+    * Hostname: virt1
+- Log in to Web UI
+- Disks: ssd, hdd
+- Network: vSwitch1-Guest:
+  + Both links
+  + 2_Standard
+  + 3_Guest
+  + 50_Production
+  + 51_DMZ
+  + 7_Infrastructure
+- Upload Debian ISO
+- Assign License

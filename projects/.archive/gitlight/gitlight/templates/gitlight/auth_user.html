@@ -1,0 +1,12 @@
+{% extends "gitlight/base.html" %}
+
+{% block title %}
+    <title>GitLight - Home</title>
+{% endblock %}
+
+{% block body %}
+<h1>{{ userdata.id}}</h1>
+
+{% for k, v in userdata.gecos_fields.items() -%}
+{{ k.capitalize() }}: {{ v }}<br />{% endfor %}
+{% endblock %}

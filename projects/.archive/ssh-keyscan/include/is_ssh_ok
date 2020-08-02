@@ -1,0 +1,805 @@
+#!/bin/sh
+#
+# Scan files/directories for non-compliant SSH keys based on Juniper policies.
+#
+# Copyright: 2019, Juniper Networks, Inc.
+#
+# This file is provided in the hope that it will be of use. There is
+# absolutely NO WARRANTY. Permission to copy, redistribute or otherwise
+# use this file is hereby granted provided that the above copyright
+# notice and this notice are left intact.
+
+
+# Print a usage for the script and exit.
+show_help() {
+    cat <<-EOF
+		SYNOSIS:
+
+		  ssh-agent.sh [-v] [-h|--help] [-c sshconfig] [dirs-or-files]...
+
+		DESCRIPTION:
+
+		  Check the files in the \$HOME/.ssh directory or any directories
+		  passed on the command line for private SSH keys.
+
+		OPTIONS:
+
+		   -v,--verbose   verbose mode print OKAY keys and algs used
+
+		   -c configfile  (default=\$HOME/.ssh/config)
+
+		   -h,--help      Show this usage output
+
+		   --tldr         The number of issues as an inteiger. 0 issues
+		                  means everything is okay.
+
+		   --quiet        Do not print anything if everything is okay.
+		
+		  -k keyfile      Path to process just one private key.
+
+		   dirs-or-files  a list of files or directories to check
+		                  (default: \$HOME/.ssh if exists, else ./)
+
+		  Possible key types include:
+		   - dsa          Digital Signature Algorith (too weak for Juniper)
+		                  see Encryption-Key-Management-Standard [2].
+		   - ecdsa        Elliptic Curve Digital Signature Algorithm
+		                  This is an approved IT algorithm [1][2].
+		   - ed25519      Edwards twisted curve Digital Signature Algorithm
+		                  This is NOT YET an approved IT algorithm.
+		   - rsa          Rivest, Shamir, Adelman public-key algorithm
+		                  This is an approved IT algorithm [2].
+		   - rsa1         SSHv1 key. This is NOT an approved algorithm.
+
+		  Possible key formats include:
+
+		  - RFC4716/SSH2
+		     public or private key format (default as of OpenSSH 7.9p1)
+
+		  - PKCS8
+		     (PEM PKCS8 public key)
+
+		  - PEM
+		     (PEM public key)
+
+		OUTPUT:
+
+		  When used with --tldr, only a brief message will be printed if
+		  there are errors or not. When used with --quiet no output will
+		  be generated unless there are problems to be fixed.
+
+		  If after generating a new key with a passphrase you are being
+		  prompted for it when using Subversion or Git, you should
+		  consider reading how to setup ssh-agent [3] in this
+		  environment. Note: macOS laptops already run ssh-agent, so
+		  using ssh-agent.sh is intended for Linux and FreeBSD hosts.
+
+		RETURN CODES:
+
+		  0   - A message of "0 issused found" will be printed
+		       This means that any private keys found were of
+		       the correct strength and were passphrase protected.
+
+		  1   - The command will print a line like:
+		       "<n> SSH key issue(s) should be fixed in your configuration."
+
+		       This means that one or more bad keys will be printed
+		       with a "Prognosis: Key is BAD" and these files
+		       should be removed from the system and a new keypair
+		       generated. There may also be "Bad permissions" which
+		       are usually enforced by the ssh command itself.
+
+		       The .ssh/authorized_keys file will be scanned to
+		       look for non-compliant keys. It is recommended that
+		       these keys be removed from the file to avoid letting
+		       someone with a compromised key from using your
+		       identity. Problem lines will add to the SSH key
+		       issue count.
+
+		Corporate IT Policies relevant to SSH may include:
+		[1]: https://core.juniper.net/sites/policy/Docs/IT/InfoSec/Cryptographic%20Policy.pdf
+		[2]: https://core.juniper.net/sites/it/security/standards/Encryption-Key-Management-Standard.pdf
+
+		Suggestions on the use of ssh-agent for handling SSH keys with passphrase
+		protection:
+		[3]: https://eng-homes.juniper.net/~sjg/HowTo/ssh-agent.htm
+		EOF
+    [ "$rc" -le 0 ] && rc=1
+    exit "$rc"
+
+}
+
+# Error out when trying to use unset variables
+set -eu
+
+# Handle internationalization
+LANG=C; export LANG
+LC_ALL=C; export LC_ALL
+
+# Defaults
+dir="$HOME/.ssh"
+verbose=false
+tldr=false
+quiet=false
+rc=0
+keysfound=0
+print_ssh_version_info=false
+printit=false
+
+# Default SSH configfile
+cf="$HOME/.ssh/config"
+
+# Constant variables. Standard messages from ssh-agent.
+noagentmsg='Could not open a connection to your authentication agent.'
+noagentkeys='The agent has no identities.'
+
+# Fetch the keys present already in the ssh-agent if any is running
+agentkeys="$(ssh-add -L 2>&1 || true)"
+
+ssh_private_key_format() {
+    private_keytype="$(sed 1q < "$1")"
+    private_keyfmt=''
+    case "$private_keytype" in
+    *-----BEGIN\ OPENSSH\ PRIVATE\ KEY-----*)
+        # Introduced in OpenSSH 6.5
+        # Default in OpenSSH 7.8+
+        private_keyfmt="OPENSSH_PRIVATE"
+        ;;
+    *-----BEGIN\ DSA\ PRIVATE\ KEY-----*)
+        private_keyfmt="PEM-DSA"
+        ;;
+    *-----BEGIN\ RSA\ PRIVATE\ KEY-----*)
+        private_keyfmt="PEM-RSA"
+        ;;
+    *-----BEGIN\ EC\ PRIVATE\ KEY-----*)
+        private_keyfmt="PEM-EC"
+        ;;
+    *SSH\ PRIVATE\ KEY\ FILE\ FORMAT*)
+        private_keyfmt="RSA1"
+        ;;
+    *) private_keyfmt="unknown"
+        ;;
+    esac
+    echo "$private_keyfmt"
+    unset private_keyfmt private_keytype
+}
+
+# Report on SSH version information
+ssh_command_versions() {
+    echo "Information regarding your SSH verions:"
+    echo "(provided as at least one key is in OPENSSH_PRIVATE key format)"
+    # Idiom to split $PATH on each ':' character to traverse all of them
+    # to look for the ssh executable.
+    for d in $(echo "$PATH" | sed 's,:, /,g'); do
+        if [ -x "$d/ssh" ]; then
+            sshver="$("$d/ssh" -V 2>&1)"
+            case "$sshver" in
+            *OpenSSH_[2-5].[0-9]*|*OpenSSH_6.[0-4]*)
+                echo "OpenSSH CMD: $d/ssh"
+                echo "OpenSSH VER: $sshver"
+                echo "      SSH KEY: Default: PEM"
+                echo "      SSH KEY: No support OpenSSH Private keys"
+                echo "      For rsa keys, use a ssh-keygen version 6.5+ with"
+                echo "        ssh-keygen -pm PEM -f filename"
+                echo "      to convert to PEM format for non-PEM RSA keys."
+                ;;
+            *OpenSSH_6.[5-9]*|*OpenSSH_[7].[0-7]*)
+                echo "OpenSSH CMD: $d/ssh"
+                echo "OpenSSH VER: $sshver"
+                echo "    SSH KEY: Supports OpenSSH Private keys"
+                echo "    SSH KEY: Default: PEM"
+                ;;
+            *OpenSSH_7.[89]*|*OpenSSH_[89]*)
+                echo "OpenSSH CMD: $d/ssh"
+                echo "OpenSSH VER: $sshver"
+                echo "    SSH KEY: Default: OpenSSH Private keys (NOT PEM)"
+                ;;
+            *)
+                echo "Unknown SSH Command $d/ssh"
+                echo "Unknown SSH output of $d/ssh -V"
+                echo "$sshver"
+            esac
+        fi
+    done
+    unset d sshver
+}
+
+ssh_file_or_dir_permissions_report() {
+    pok=false
+    case "$1" in
+    *BAD*) $tldr || pok=: ;;
+    *) $tldr || { $verbose && pok=:; };;
+    esac
+    $pok && echo "$1"
+    unset pok
+}
+
+ssh_dir_permissions_report() {
+    [ -e "$2" ] || return 0
+    gb="$(ssh_check_file_permissions 'd????-??-?' "$2")"
+    ssh_file_or_dir_permissions_report "$1$gb"
+    unset gb
+}
+
+ssh_file_permissions_report() {
+    [ -e "$2" ] || return 0
+    gb="$(ssh_check_file_permissions '-????-??-?' "$2")"
+    ssh_file_or_dir_permissions_report "$1$gb"
+    unset gb
+}
+
+# Consider file and directory permissions
+# 1: expression for case statement to match
+# 2: read the filename or directory name for permissions
+# A match returns a Good result, otherwise a BAD result.
+ssh_check_file_permissions() {
+    [ -e "$2" ] || return 0
+    read -r perm _ u _ <<-EOF
+		$(command ls -ldL "$2")
+		EOF
+    if [ "$u" != "${USER}" ] && [ "$u" != "root" ]; then
+        echo "BAD - file $2 owned by '$u' NOT by '$USER' as expected"
+        command ls -ldL "$2"
+        rc=$((1 + rc))
+    fi
+
+    case "$perm" in
+    ${1}*) gb=Good;;
+    *) gb=BAD; rc=$((1 + rc));;
+    esac
+    echo "$gb permissions (perm=$perm)"
+    unset gb perm u
+}
+
+# Decode a private key file assumed to be in a PEM format with the
+# first and last lines being a "-----(BEGIN|END)*-----" line.
+ssh_private_key_alg() {
+    alg=none
+
+    # Look on line 2 for the interesting information
+    # A prefix of "b3BlbnNzaC1rZXktdjE" is a openssh-key-v1
+    # encoded in base64. A prefix of "MII" is an ASN.1 encoded SEQ.
+    # A line with Proct-Type on line two and DEK-Info on line three
+    # indicates a more traditional PEM encrypted private key of some
+    # sort.
+    case "$(sed -n 2p "$1")" in
+    Proc-Type:*,ENCRYPTED)
+        # PEM or public key format aka legacy encrypted private key format
+        alg="$(sed -n '3s/^DEK-Info: //;s/,.*$//;3p' "$1")"
+        ;;
+    b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHI*)
+        # In SSHKEY_PRIVATE format, encryption algorithm=aes256-ctr
+        alg=aes256-ctr
+        ;;
+    b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jYmMA*)
+        # In SSHKEY_PRIVATE format, encryption algorithm=aes256-cbc
+        alg=aes256-cbc
+        ;;
+    b3BlbnNzaC1rZXktdjEAAAAACmFlczEyOC1jYmMA*)
+        # In SSHKEY_PRIVATE format, encryption algorithm=aes128-cbc
+        alg=aes128-cbc
+        ;;
+    b3BlbnNzaC1rZXktdjEAAAAACmFlczEyOC1jdHIA*)
+        # In SSHKEY_PRIVATE format, encryption algorithm=aes128-ctr
+        alg=aes128-ctr
+        ;;
+    b3BlbnNzaC1rZXktdjEAAAAABG5vbmU*)
+        # In SSHKEY_PRIVATE format, encryption algorithm=none
+        alg=none
+        ;;
+    MII*)
+        # Legacy unencrypted format ASN.1 encoded PEM format
+        alg=none
+        ;;
+    b3BlbnNzaC1rZXktdjE*)
+        alg=unknown-SSHKEY_PRIVATE
+        ;;
+    *)
+        alg=unknown
+        ;;
+    esac
+    echo "$alg"
+    unset alg
+}
+
+# Check directory permissions going up the tree.
+ssh_check_dir_hierarchy_permissions() {
+    pdir="$1/."
+    # Default for when we are scanning other directories
+    stopdir=/
+    case "$pdir" in $HOME/*) stopdir="$(dirname "$HOME")";; esac
+    while [ "$pdir" != "$stopdir" ]
+    do
+        pdir="$(dirname "$pdir")"
+        ssh_dir_permissions_report "Directory: $pdir -- " "$pdir"
+    done
+    unset pdir stopdir
+}
+
+# Checks on an SSH private key:
+# - encrypted/unencrypted
+# - if encrypted, using what algorithm
+# - if there is a matching public key file (<private-keyfilename>.pub)
+#   + key type and bit size
+#   + if the public key is in the authorized_keys
+#   + if the public key is in the ssh-agent (if running)
+ssh_check_private_key_file() {
+    bits='' enc='' msg='' name='' pubkey='' size=''
+    printit=$verbose gb=BAD
+
+    fmt="$(ssh_private_key_format "$1")"
+    if [ "$fmt" = "RSA1" ]; then
+        alg="$fmt"
+    else
+        alg="$(ssh_private_key_alg "$1")"
+    fi
+    unset fmt
+
+    case "$alg" in
+    none)
+        $tldr || printit=:
+        enc="key material is unencrypted alg=$alg"
+        msg="Unenrypted private keys must be deleted."
+        ;;
+    RSA1)
+        $tldr || printit=:
+        enc="Obsolete SSHv1 keys MUST be removed."
+        msg="Delete this key."
+        ;;
+    unknown*)
+        $tldr || printit=:
+        enc="key material is encoded and MAY be unencrypted alg=$alg"
+        msg="Unenrypted private keys must be deleted. Report this message."
+        ;;
+    *)
+        enc="key material is encrypted using $alg"
+        gb=Good
+        ;;
+    esac
+    unset alg
+
+    found_pubkey=false
+    # It is not an error if the public key is not arround, but it
+    # makes this script work harder and it may not catch keysize issues.
+    if [ -f "$1.pub" ]; then
+        found_pubkey=:
+        pubkey="$(awk '{ print $2 }' "$1.pub")"
+
+    read -r size name <<-EOF
+		$(ssh-keygen -l -f "$1.pub" |
+			awk '{print $1 " " tolower(substr($NF,2,length($NF)-2))}')
+		EOF
+
+        case "$name" in
+        dsa)
+            bits="(-t $name -b $size)";
+            msg="dsa is a weak algorithm and 1024-bits violates policy"
+            gb=BAD
+            $tldr || printit=:
+            ;;
+        rsa)
+            bits="(-t $name -b $size)"
+            if [ "$size" -lt 2048 ]; then
+                msg="Use of $name with less than 2048-bits violates policy"
+                gb=BAD
+                $tldr || printit=:
+            fi
+            ;;
+        rsa1)
+            bits="(-t $name -b $size)"
+            gb=BAD
+            $tldr || printit=:
+            ;;
+        ed25519)
+            bits="(-t $name -b $size)"
+            ;;
+        ecdsa)
+            bits="(-t $name -b $size)"
+            ;;
+        *)
+            ;;
+        esac
+    fi
+
+    [ "$gb" = "BAD" ] && rc=$((1 + rc))
+
+    if $printit; then
+
+        key_fmt="$(ssh_private_key_format "$1")"
+
+        echo
+        echo "File:      $1"
+        echo "Perms:     $(ssh_check_file_permissions '-r?------' "$1")"
+        echo "key_fmt:   $key_fmt"
+        case "$key_fmt" in
+        *PEM*) ;;               # works with any SSH version
+        *RSA1*)
+                print_ssh_version_info=:
+                echo "Note:      SSHv1 keys should not be used."
+                ;;
+        *)
+            if [ "$name" = "rsa" ]; then
+                print_ssh_version_info=:
+                echo "Note:      OpenSSH < 6.5 will not be able to read this $name key"
+                echo "           Use: 'ssh-keygen -pm PEM -f $1' to convert."
+                echo "           on the same host that generated it."
+            fi
+            ;;
+        esac
+
+        if $found_pubkey; then
+            echo "Pubkey:    $1.pub (file exists)"
+            echo "Perms:     $(ssh_check_file_permissions '-????-??-?' "$1.pub")"
+        else
+            pubkey=ENOFILE
+            echo "Pubkey:    $1.pub (file NOT found)"
+	    msg="Key compliance cannot be determined. Use 'ssh-keygen -y -f $1 > $1.pub' or delete key."
+	    gb=BAD
+	    rc="$((rc + 1))"
+            if [ "$key_fmt" = "PEM-DSA" ]; then
+                bits="(-t dsa)"
+                msg="dsa is a weak algorithm and 1024-bits violates policy"
+                $tldr || printit=:
+            elif [ "$key_fmt" = "PEM-RSA" ]; then
+                bits="(-t rsa -b <unknown>)"
+            elif [ "$key_fmt" = "PEM-EC" ]; then
+                bits="(-t ecdsa -b <unknown>)"
+            else
+                bits="(-t <unknown> -b <unknown>)"
+            fi
+        fi
+        echo "Privkey:   $enc"
+        echo "KeyType:   $bits"
+        echo "Prognosis: Key is $gb"
+        [ "$msg" ] && echo "msg:       $msg"
+
+        ak="$HOME/.ssh/authorized_keys"
+        if [ -r "$ak" ]; then
+            line="$(grep -n "$pubkey" "$ak" | sed 's,:.*$,,')"
+            if [ -z "$line" ]; then
+                [ "$gb" = "Good" ] && \
+                    echo "Pubkey NOT used in $ak"
+            else
+                case "$line" in
+                *\ *)
+                    l="$(echo "$line" | sed 's/ /, /g')"
+                    echo "Pubkey used on lines [ $l ] of $ak"
+                    unset l
+                    ;;
+                *) echo "Pubkey used on line $line of $ak"
+                   ;;
+                esac
+                [ "$gb" = "BAD" ] && \
+                    echo "Please delete BAD key from $ak file."
+            fi
+            unset line
+        fi
+
+        case "$agentkeys" in
+        *$noagentmsg*) ;;
+        *$pubkey*)
+            echo "Pubkey IS present in ssh-agent"
+            [ "$gb" = "BAD" ] && \
+                echo "Consider using ssh-add -D to wipe all ssh-agent keys."
+            ;;
+        *)
+            [ "$gb" = "Good" ] && \
+                echo "Pubkey IS NOT present in ssh-agent"
+            ;;
+        esac
+        echo
+    fi
+    unset bits enc msg name pubkey size
+}
+
+ssh_process_authorized_key_file() {
+    cat -n "$1" |
+        sed -e '/\#/d' -e 's/command=\"[^\"]*\"//' -e 's/,,//g' |
+    while read -r linenum f1 f2 f3 comment rest
+    do
+        case "$f1" in
+        \#*)
+            echo "  Line $linenum Comment ignored."
+            continue
+            ;;
+        *=*) ktype=$f2; pubkey=$f3; comment=$comment ;;
+        *)   ktype=$f1; pubkey=$f2; comment=$f3 ;;
+        esac
+
+        case "$ktype" in
+        1024)
+            # format 1024 <number> <number> <comment>
+            echo "  Line $linenum BAD (obsolete) SSHv1 key should be removed."
+            ;;
+        ssh-dss)
+            echo "  Line $linenum BAD (deprecated) DSA 1024-bit key should be removed."
+            ;;
+        ecdsa-sha2-nistp*|ssh-ed25519)
+            echo "  Line $linenum GOOD $ktype key."
+            ;;
+        ssh-rsa)
+            tmpfile="/tmp/$USER.$$.pub"
+            echo "$ktype $pubkey $comment" > "$tmpfile"
+            # Key length
+        kl="$(ssh-keygen -l -f "$tmpfile" | awk '{print $1}')"
+            command rm -f "$tmpfile"
+            if [ "$kl" -lt 2048 ]; then
+                echo "  Line $linenum BAD (too small) RSA $kl-bit key should be removed."
+            else
+                echo "  Line $linenum GOOD RSA $kl-bit key."
+            fi
+            ;;
+        *)
+            echo "  Line $linenum Unknown keytype $ktype found."
+            ;;
+        esac
+    done
+}
+
+ssh_check_authorized_keys() {
+    lcount="$(wc -l < "$1")"
+    mf=/tmp/$USER.issshok-msgs.$$.txt
+
+    if ! $tldr; then
+        $verbose && echo "File: $1 -- performing keysize check ($lcount lines)"
+    fi
+
+    # lines look like [[var=value],] <keytype> <pubkey> <comment>
+    # Truncate the output file to ensure we are able to write to it.
+    : > "$mf" || {
+        echo "Warning: Unable to write to $mf" >&2
+        echo "Warning: Skipping processing of $1" >&2
+        return
+    }
+    ssh_process_authorized_key_file "$1" >> "$mf"
+
+    msgcnt="$(grep -c BAD "$mf" || true)"
+    rc="$((msgcnt + rc))"
+
+    if ! $tldr; then
+        if [ "$msgcnt" -gt 0 ]; then
+            echo "$msgcnt Issues for $1 (scan of $lcount lines)"
+            $verbose && cat "$mf"
+            $verbose || grep -v GOOD "$mf"
+        else
+            echo "No issues for $1 (scan of $lcount lines)"
+            $verbose && cat "$mf"
+        fi
+    fi
+    command rm -f "$mf"
+}
+
+ssh_identityfiles() {
+    # Look for mentions of keys in the SSH config file.
+    [ -r "$cf" ] || return 0
+    # Assumption: There are no spaces in the IdentityFile pathname.
+    awk '{ $1=tolower($1); if ($1 ~ /identityfile/) print $NF }' <"$cf" | \
+                sed "s,~/,$HOME/," | sort -u | \
+                while IFS='' read -r myline; do
+        lnum="$(echo "$myline" | sed 's,:.*$,,')"
+        file="$(echo "$myline" | sed 's,^.*:[ \t]*,,')"
+        [ -r "$file" ] || continue
+        if echo "$filelist" | grep -v " $file " > /dev/null; then
+            if [ -e "$file" ]; then
+                $tldr || { \
+                    $verbose && echo "Checking $cf use of IdentityFile $file";
+                }
+                ssh_check_private_key_file "$file"
+                $tldr || echo
+            else
+                $tldr && continue
+                echo "$cf references line $lnum unknown IdentifyFile $file"
+            fi
+        fi
+    done
+}
+
+ssh_agent_status() {
+    # Indicate to the user if an ssh-agent is running.
+    # If so, tell the user if it does not have any keys in it.
+    if ! $quiet; then
+        $tldr && return 0
+        case "$agentkeys" in
+        *$noagentmsg*)
+            if $verbose; then
+                echo ''
+                echo 'You are not yet running an ssh-agent.';
+                echo ''
+            fi
+            ;;
+        *$noagentkeys*)
+            echo ''
+            echo "$noagentkeys" "Consider running 'ssh-add'";
+            echo ''
+            ;;
+        esac
+    fi
+    return 0
+}
+
+issshok_summary() {
+    if [ $rc -gt 0 ]; then
+        $tldr || echo
+        $verbose && echo "$keysfound private key(s) found." >&2
+        echo "$rc SSH key issue(s) should be fixed in your configuration." >&2
+        $tldr && echo "Try running without --tldr for more details." >&2
+        exit 1
+    else
+        if ! $quiet; then
+            $verbose && echo "$keysfound private key(s) found." >&2
+            echo "0 issues found in $dir" >&2
+        fi
+    fi
+    return 0
+}
+
+scan_dirs=''
+file_scans=''
+# Main command-line processing loop for options.
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+    -v|--verbose)
+        verbose=:
+        shift
+        ;;
+    -h|--help)
+        show_help
+        ;;
+    # Specify a config file to use to search for IdentityFile entries
+    -c)
+        cf="$2"; shift 2
+        # Provide a way to avoid processing a .ssh/config file
+        if [ "$cf" = "/dev/null" ]; then
+            cf=''
+        elif [ -r "$cf" ]; then :; else
+            echo "ERROR: configfile '$2' not readable."
+            show_help
+        fi
+        ;;
+    # Analyze the provided private key file
+    -k)
+        verbose=:
+        tldr=false
+        [ -e "$2" ] || {
+            echo "ERROR: -k $2 needs the keyfile to be a file."
+            show_help
+        }
+        if egrep '^(-----BEGIN.*PRIVATE KEY-----|SSH PRIVATE KEY FILE FORMAT)' "$2" > /dev/null; then
+            ssh_check_private_key_file "$2"
+        else
+            echo "ERROR: Keyfile '$2' is not a private key."
+            show_help
+        fi
+        file_scans='yes'
+        shift 2
+        ;;
+    --tldr)
+	tldr=:
+	shift
+	;;
+    --quiet)
+	quiet=:
+	tldr=false
+	verbose=false
+	shift
+	;;
+    # Stop processing command-line arguments
+    --)
+	shift
+	break
+	;;
+    -*)
+	echo "ERROR: Uknown option '$1'"
+	show_help
+	;;
+    *)
+	scan_dirs="$scan_dirs $1"
+	shift
+	;;
+    esac
+done
+
+# Stop processing if individual key files were scanned
+if [ "$file_scans" ]; then
+    issshok_summary
+    exit "$rc"
+fi
+
+# Try to avoid reporting on the same key more than once
+filelist=' '
+
+# Process any directories provided on the command-line.
+if [ ! "$scan_dirs" ]; then
+    # If $dir does not exist, then default to current directory
+    [ -e "$dir" ] || dir='.'
+    for file in $(find -L "$dir" -type f -print0 | \
+            xargs -0 egrep -rl '^(-----BEGIN.*PRIVATE KEY-----|SSH PRIVATE KEY FILE FORMAT)'); do
+        ssh_check_private_key_file "$file"
+        filelist=" $file $filelist"
+        keysfound=$((1 + keysfound))
+    done
+else
+    for dir in $scan_dirs; do
+	echo "DIR: $dir"
+        for file in $(find -L "$dir" -type f -print0 | \
+                xargs -0 egrep -rl '^(-----BEGIN.*PRIVATE KEY-----|SSH PRIVATE KEY FILE FORMAT)'); do
+            ssh_check_private_key_file "$file"
+            filelist=" $file $filelist"
+            keysfound=$((1 + keysfound))
+        done
+    done
+fi
+
+# Now look for any private keys referenced from $cf
+ssh_identityfiles
+
+# General permissions check for config
+[ -r "$cf" ] && ssh_file_permissions_report "File: $cf -- " "$cf"
+
+# This file may also provide logins to CVS servers,
+# so complain about public keys that are deprecated
+# or too small.
+akfile="$HOME/.ssh/authorized_keys"
+if [ -e "$akfile" ]; then
+    ssh_file_permissions_report "File: $akfile -- " "$akfile"
+    ssh_check_authorized_keys "$akfile"
+fi
+unset akfile
+
+# This file is NOT used in all sshd implementations.
+# In fact, it was deprecated for OpenSSH 3.0, but is
+# still read-only in OpenSSH 8.0.
+akfile2="$HOME/.ssh/authorized_keys2"
+if [ -e "$akfile2" ]; then
+    # Deal with the case of authorized_keys2 being a symlink to
+    # authorized_keys. Does not optimize for the link being a full
+    # pathname.
+    if [ -h "$akfile2" ]; then
+        lnk="$(readlink "$akfile2" || true)"
+        if [ "$lnk" = 'authorized_keys' ]; then
+            $tldr || {
+                $verbose && {
+                    echo "Link: $akfile2 -> $lnk -- skip permissions check"
+                    echo "Link: $akfile2 -> $lnk -- skip keysize check"
+                }
+            }
+        else
+            ssh_file_permissions_report "File: $akfile2 -- " "$akfile2"
+            ssh_check_authorized_keys "$akfile2"
+        fi
+        unset lnk
+    fi
+    $tldr || echo "Note: File: $akfile2 -- deprecated "
+    $tldr || echo "      (on Oct 10, 2001 by OpenSSH 3.0+ backward compatibility only)"
+fi
+unset akfile2
+
+
+$tldr || { $verbose && echo; }
+$tldr || { $verbose && ssh_check_dir_hierarchy_permissions "$dir"; }
+
+$tldr || { $print_ssh_version_info && ssh_command_versions; }
+
+ssh_agent_status
+
+if [ "$keysfound" -eq 0 ]; then
+    if ! $quiet; then
+        if $tldr; then
+            ak="$HOME/.ssh/authorized_keys"
+            cnt=''
+            if [ -r "$ak" ]; then
+                cnt=$(wc -l < "$ak")
+                echo "No private keys found. $ak has $cnt lines."  >&2
+                exit 1
+            else
+                echo "No private keys found. No $ak found."  >&2
+                exit 1
+            fi
+            unset ak cnt
+        fi
+    fi
+fi
+
+issshok_summary
+
+exit "$rc"

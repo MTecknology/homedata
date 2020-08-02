@@ -1,0 +1,21 @@
+# Postscreen Configurations
+postscreen_dnsbl_threshold = 2
+# commented out the following to remove b.barracuda* as it denies access without subscription or something. trying without barracuda.
+#postscreen_dnsbl_sites = zen.spamhaus.org*2, bl.spamcop.net*1, b.barracudacentral.org*1
+postscreen_dnsbl_sites = zen.spamhaus.org*2, bl.spamcop.net*1, b.barracudacentral.org*1
+postscreen_dnsbl_action = enforce
+postscreen_greet_action = enforce
+#postscreen_pipelining_enable = yes
+#postscreen_non_smtp_command_enable = yes
+#postscreen_bare_newline_enable = yes
+
+
+
+Nov  3 17:25:09 mx2 postfix/postscreen[5830]: CONNECT from [221.208.90.134]:19716 to [*]:25
+Nov  3 17:25:09 mx2 postfix/dnsblog[5833]: addr 221.208.90.134 listed by domain zen.spamhaus.org as 127.0.0.3
+Nov  3 17:25:09 mx2 postfix/dnsblog[5833]: addr 221.208.90.134 listed by domain zen.spamhaus.org as 127.0.0.11
+Nov  3 17:25:09 mx2 postfix/dnsblog[5831]: addr 221.208.90.134 listed by domain b.barracudacentral.org as 127.0.0.2
+Nov  3 17:25:15 mx2 postfix/postscreen[5830]: DNSBL rank 3 for [221.208.90.134]:19716
+Nov  3 17:25:15 mx2 postfix/postscreen[5830]: NOQUEUE: reject: RCPT from [221.208.90.134]:19716: 550 5.7.1 Service unavailable; client [221.208.90.134] blocked using zen.spamhaus.org; from=<jonellemacfarland@lasqdev.com>, to=<hostmaster@*>, proto=ESMTP, helo=<lasqdev.com>
+Nov  3 17:25:16 mx2 postfix/postscreen[5830]: DISCONNECT [221.208.90.134]:19716
+

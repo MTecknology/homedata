@@ -1,0 +1,55 @@
+/**
+ * Template
+ */
+
+html {
+  background: url("/static/images/background.jpg") repeat scroll 0 0 transparent;
+}
+
+body {
+  font-family: Arial,Helvetica,sans-serif;
+  line-height: 2em;
+  margin: 0;
+  padding: 0;
+}
+
+table {
+  background: none repeat-x scroll 0 0 #ffffff;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#wrapper {
+  width: 800px;
+  margin: 0 auto;
+  background: #ffffff;
+}
+
+.bar {
+  background: url("/static/images/bar.jpg") repeat-x scroll 0 0 transparent;
+  color: #ffffff;
+  font-size: 1.188em;
+  font-weight: bold;
+  height: 22px;
+  padding: 0.75em 0.625em 0.625em;
+  text-align: center;
+}
+
+/**
+ * File List
+ */
+
+#files {
+  text-align: left;
+  width: 100%;
+  float: left;
+  line-height: 1.4;
+}
+
+#files .directory {
+  background: url("/static/images/folder.png") no-repeat scroll 0 0 transparent;
+}
+
+#files .file {
+  background: url("/static/images/file.png") no-repeat scroll 0 0 transparent;
+}

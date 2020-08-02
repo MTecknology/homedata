@@ -1,0 +1,2 @@
+declare -a backuplist
+backuplist=('/etc' '/srv' '/opt'{% for b in salt['pillar.get']('backup_dirs:incl', []) %} '{{ b }}'{% endfor %})

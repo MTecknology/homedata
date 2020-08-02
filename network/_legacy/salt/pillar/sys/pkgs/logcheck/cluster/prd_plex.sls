@@ -1,0 +1,2 @@
+extra_ignores:
+  - plex

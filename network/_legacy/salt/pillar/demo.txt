@@ -1,0 +1,49 @@
+structure
+---------
+
+michael@computer:~/repos/salt/pillar/pkgs$ ls
+_  enabled.sls	README	test
+
+michael@computer:~/repos/salt/pillar/pkgs$ ls test/
+cluster  dc  defaults.sls  node
+
+michael@computer:~/repos/salt/pillar/pkgs$ cat test/defaults.sls 
+test:
+  datacenter: unknown
+  foo:
+    bar:
+      - fuz
+      - buz
+    key1: DEFAULT
+    key2: default
+  fuz: x
+
+michael@computer:~/repos/salt/pillar/pkgs$ cat test/dc/sv1.sls 
+test:
+  datacenter: sv1
+
+michael@computer:~/repos/salt/pillar/pkgs$ cat test/cluster/q_all.sls 
+test:
+  foo:
+    key1: quad
+
+
+console
+-------
+
+root@saltnode:~# salt-call pillar.get test
+local:
+    ----------
+    datacenter:
+        sv1
+    foo:
+        ----------
+        bar:
+            - fuz
+            - buz
+        key1:
+            quad
+        key2:
+            default
+    fuz:
+        x

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<a href="/files">File Restore</a> | <a href="/move">File Move</a><br />
+<center>
+  <form id="move" action="/move" method="post" accept-charset="UTF-8" style="width: 360px;">
+    <fieldset>
+      <legend>File Mover - Confirm Large Home Directory</legend>
+      This users documents total {{ dat['size'] }}MB. This may take a very long time to
+      transfer. Confirmation is required before continuing. <br /><br />
+      Confirm Move?<br />
+      <input type="hidden" id="curusr" name="curusr" value="{{ dat['curusr'] }}" />
+      <input type="hidden" id="curcnt" name="curcnt" value="{{ dat['curcnt'] }}" />
+      <input type="hidden" id="newusr" name="newusr" value="{{ dat['newusr'] }}" />
+      <input type="hidden" id="newcnt" name="newcnt" value="{{ dat['newcnt'] }}" />
+      <input type="hidden" id="action" name="action" value="{{ dat['action'] }}" />
+      <input type="submit" name="accepted" value="cancel" />&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="accepted" value="yup" />
+    </fieldset>
+  </form>
+</center>
+{% endblock %}

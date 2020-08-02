@@ -1,0 +1,35 @@
+Vagrant.configure('2') do |config|
+
+  # Box Setup
+  config.vm.box = 'debian/contrib-testing64'
+  config.vm.provision 'shell', path: '.vagrant/bootstrap'
+
+  # Shared Dirs
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder ".", "/home/vagrant/dev"
+
+  # Port Forwarding
+  #   App running via 'make run'
+  config.vm.network 'forwarded_port', guest: 5055, host: 5055, host_ip: '127.0.0.1'
+  #   App running via uwsgi+nginx
+  config.vm.network 'forwarded_port', guest: 5070, host: 5070, host_ip: '127.0.0.1'
+  #   Docs available via nginx (after: vagrant ssh; make docs)
+  config.vm.network 'forwarded_port', guest: 5071, host: 5071, host_ip: '127.0.0.1'
+
+  # Providers
+  config.vm.provider "virtualbox"
+
+  # Virtualbox
+  config.vm.provider 'virtualbox' do |vb|
+    vb.gui = false
+    vb.memory = '1024'
+  end
+
+  # Post-Deploy Message
+  config.vm.post_up_message = <<-EOF
+    Dev box deployed!
+
+    Visit http://docs.gitlight.io/hacking for usage tips.
+  EOF
+
+end

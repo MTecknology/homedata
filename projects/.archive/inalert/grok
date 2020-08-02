@@ -1,0 +1,9 @@
+# NOTE :: These regular expressions should have been fixed instead of split.
+#         Due to lack of knowledge, these have some backtracking problems:
+#         - https://www.regular-expressions.info/catastrophic.html
+
+ATTACK_EMAIL     Agent\sName(?:[^>]+>){2}(?<agent_name>[^<]+)<[^\n]+Faction(?:[^>]+>){2}(?<agent_faction>[^<]+)<[^\n]+Current\sLevel(?:[^>]+>){2}L(?<agent_level>[^<]+)[^\n]+DAMAGE\sREPORT(?:[^>]+>){6}(?<portal_name>[^<]+).+?ll=(?<portal_location>[^&]+)&pll=(?<latitude>\-?[0-9]{1,3}\.[0-9]{1,7})[0-9]*[\s,]+(?<longitude>\-?[0-9]{1,3}\.[0-9]{1,7})[^>]+>(?<portal_address>[^<]+)[^\n]+DAMAGE[^>]+>(?<portal_damage>[^>]+)\sby[^>]+>(?<portal_attacker>[^<]+)(?:[^>]+>){2}(?<portal_life>[^.]+)[^\n]+Level\s(?<portal_level>[0-9]+)[^\n]+Health:\s(?<portal_health>[0-9]+)[^\n]+Owner(?:[^>]+>)(?<portal_owner>[^<]+)
+
+ATTACK_MSG_P1     Agent\sName(?:[^>]+>){2}(?<agent_name>[^<]+)<[^\n]+Faction(?:[^>]+>){2}(?<agent_faction>[^<]+)<[^\n]+Current\sLevel(?:[^>]+>){2}L(?<agent_level>[^<]+)
+ATTACK_MSG_P2     DAMAGE\sREPORT(?:[^>]+>){6}(?<portal_name>[^<]+).+?ll=(?<portal_location>[^&]+)&pll=(?<latitude>\-?[0-9]{1,3}\.[0-9]{1,7})[0-9]*[\s,]+(?<longitude>\-?[0-9]{1,3}\.[0-9]{1,7})[^>]+>(?<portal_address>[^<]+)
+ATTACK_MSG_P3     DAMAGE[^>]+>(?<portal_damage>[^>]+)\sby[^>]+>(?<portal_attacker>[^<]+)(?:[^>]+>){2}(?<portal_life>[^.]+)[^\n]+Level\s(?<portal_level>[0-9]+)[^\n]+Health:\s(?<portal_health>[0-9]+)[^\n]+Owner(?:[^>]+>)(?<portal_owner>[^<]+)

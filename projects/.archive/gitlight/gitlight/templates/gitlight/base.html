@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    {% block title %}{% endblock %}
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/static/site.css">
+    {% block scripts %}{% endblock %}
+  </head>
+  <body>
+    <div id="main-menu" class="pos-relative">
+      <header class="heading d-flex" role="banner">
+        <div class="header-item expand">
+	  <nav class="d-flex">
+	    <a class="header-link" href="/repos">Repositories</a>
+	    <a class="header-link" href="/ping">Test Ping</a>
+	  </nav>
+	</div>
+        <div class="header-item">
+	  <a class="header-link" href="/login">Log In</a>
+	  / <a class="header-link" href="/logout">Log Out</a>
+	</div>
+      </header>
+    </div>
+    <div class="container">
+      <div id="sub-menu" class="pos-relative">
+      </div>
+      <div id="content" class="pos-relative">
+        {% if errors %}<span class="error_message">{% for error in errors %}
+          <span class="error">{{ error }}</span>{% endfor %}
+        </span>{% endif %}
+        {% block body %}{% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

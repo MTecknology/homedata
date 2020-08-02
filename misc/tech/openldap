@@ -1,0 +1,202 @@
+from my notes
+
+
+http://www.openldap.org/doc/admin24/guide.html
+
+http://docs.fedoraproject.org/en-US/Fedora/17/html/System_Administrators_Guide/index.html
+
+http://docs.fedoraproject.org/en-US/Fedora/17/html/System_Administrators_Guide/ch-Directory_Servers.html
+
+yum install openldap openldap-clients openldap-servers
+
+configure slapd using the v2.4 slapd-config method
+---
+you can't really create an empty ldap database because the files to load 
+the schema are not part of fedora, they would have to be downloaded 
+elsewhere.  So in order to have the schemas, keep the current db 
+configuration and add a domain specific for mikelustfield.me   It isn't 
+possible to deleted the example domain since openldap doesn't really 
+support any type of delete operations.
+
+so basically keep the ldap db that is there but modify it to make more 
+secure and add my own db for the mikelustfield.me  root
+
+to list the curent ldap config:
+ldapsearch -Y EXTERNAL -H ldapi:/// -b "cn=config"
+or
+slapcat -b cn=config
+---
+in modify_ldap.ldif:
+
+# global configuration settings
+dn: cn=config
+changetype: modify
+add: olcIdleTimeout
+olcIdleTimeout: 300
+
+add: olcAllows
+olcAllows: bind_v2
+
+add: olcDisallows
+olcDisallows: bind_anon tls_2_anon
+---
+ldapmodify -Y EXTERNAL -H ldapi:///  -f modify_ldap.ldif
+
+ldapdelete -v -Y EXTERNAL -H ldapi:/// "olcDatabase={2}hdb,cn=config"
+v2.4 doesn't allow for deleting databases...
+
+---
+put in create_mep_domain.ldif:
+
+# BDB definition for mikelustfield.me
+dn: {3}olcDatabase=bdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcBdbConfig
+olcDatabase: bdb
+olcReadonly: FALSE
+olcSizeLimit: 20
+olcSuffix: dc=mikelustfield,dc=me
+
+olcTimeLimit: 30
+olcDbDirectory: /var/lib/ldap-me
+olcDbCacheSize: 100
+olcDbCheckpoint: 1024 10
+olcDbConfig: set_cachesize 0 1048576 0
+olcDbConfig: set_lg_bsize 524288
+olcDbConfig: set_flags DB_LOG_AUTOREMOVE
+olcDbIDLcacheSize: 3000
+olcDbIndex: uid pres,eq
+olcDbIndex: cn,sn pres,eq,approx,sub
+olcDbIndex: objectClass eq
+
+---
+mkdir /var/lib/ldap-me
+chown  -R ldap:ldap /var/lib/ldap-me
+chcon -R -u system_u -t slapd_db_t /var/lib/ldap-me
+ls -lZd /var/lib/ldap-me
+ldapadd -v -Y EXTERNAL -H ldapi:///  -f create_mep_domain.ldif
+ldapadd -v -Y EXTERNAL -H ldapi:///  -f schema/cosine.ldif
+ldapadd -v -Y EXTERNAL -H ldapi:///  -f schema/inetorgperson.ldif
+ldapadd -v -Y EXTERNAL -H ldapi:///  -f schema/openldap.ldif
+
+---
+modify_mep_domain.ldif
+dn: olcDatabase={3}bdb,cn=config
+replace: olcRootDN
+olcRootDN: cn=Admin,dc=mikelustfield,dc=me
+
+replace: olcRootPW
+olcRootPW: asdfasdfasdfasdf
+olcRootPW: {SSHA}/Fqhl8pcbDp9u7z9TVn7lBUaT+i0SqWM
+
+replace: olcAccess
+olcAccess: {0}to attrs=userPassword,shadowLastChange
+   by self write
+   by anonymous auth
+   by dn="cn=Admin,dc=mikelustfield,dc=me" write
+   by * none
+
+add: olcAccess
+olcAccess: {1}to *
+   by dn="cn=Admin,dc=mikelustfield,dc=me" write
+   by auth read
+   by * none
+
+ldapmodify -v -Y EXTERNAL -H ldapi:///  -f modify_mep_domain.ldif
+
+---
+create_initial_users_groups.ldif
+# Create top-level object in domain
+dn: dc=mikelustfield,dc=me
+objectClass: top
+objectClass: dcObject
+objectclass: organization
+o: mikelustfield.me
+dc: mikelustfield
+description: top
+
+dn: uid=Admin,dc=mikelustfield,dc=me
+uid: Admin
+cn: Admin
+sn: Admin
+objectClass: top
+objectclass: inetorgperson
+userPassword: Turkey3stitch9unit
+description: LDAP administrator
+
+dn: ou=people,dc=mikelustfield,dc=me
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=mikelustfield,dc=me
+objectClass: organizationalUnit
+ou: groups
+
+dn: uid=mike,ou=people,dc=mikelustfield,dc=me
+objectClass: inetorgperson
+objectClass: shadowAccount
+uid: mike
+sn: lustfield
+givenName: Mark
+cn: mike.lustfield
+displayName: Mark Preston
+userPassword: asdfasdfasdfasdsf
+shadowExpire: -1
+shadowFlag: 0
+shadowWarning: 7
+shadowMin: 8
+shadowMax: 999999
+shadowLastChange: 10877
+mail: mike.lustfield@mikelustfield.me
+o: mikelustfield
+title: System Administrator
+initials: mep
+
+dn: cn=Administrators,ou=groups,dc=mikelustfield,dc=me
+objectClass: groupOfNames
+cn: Administrators
+member: uid=Admin,dc=mikelustfield,dc=me
+member: cn=mike.lustfield,ou=people,dc=mikelustfield,dc=me
+
+ldapadd -v -D "cn=Admin,dc=mikelustfield,dc=me" -w asdfadsfadfassdf -H 
+ldapi:///  -f create_initial_users_groups.ldif
+----
+# so it seems ldap groups are not the same as oracle goups so for now 
+i'm leaving them alone and see if i can get in to ldap via jexplorer
+
+create_group.ldif
+dn: cn=Administrators,ou=groups,dc=mikelustfield,dc=me
+cn: Administrators
+objectClass: top
+member: uid=Admin,dc=mikelustfield,dc=me
+
+ldapadd -v -Y EXTERNAL -H ldapi:///  -f create_group.ldif
+---
+
+start service:
+systemctl start slapd.service
+
+to list the curent ldap config:
+ldapsearch -Y EXTERNAL -H ldapi:/// -b "cn=config"
+or
+slapcat -b cn=config
+
+systemctl stop slapd.service
+
+uid=Admin,dc=mikelustfield,dc=me
+password: asdfasdfasdfassdf
+
+to test:
+ldapsearch -x -b 'dc=mikelustfield,dc=me' '(objectclass=*)'
+should fail because anon is disallowed
+ldapsearch -x -D "cn=Manager,dc=mikelustfield,dc=me" -W -b 
+'dc=mikelustfield,dc=me' '(objectclass=*)'
+
+if ok then enable at startup:
+systemctl enable slapd.service
+
+Local access: ldapi:///
+remote access it should be:
+ldap://mikelustfield.me
+or mikelustfield.me:389
+

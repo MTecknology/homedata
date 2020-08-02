@@ -1,0 +1,18 @@
+[run]
+branch = True
+data_file = _build/.coverage
+omit =
+    */conf/*
+    */lib/python*
+
+[report]
+show_missing = True
+ignore_errors = False
+sort = Cover
+
+[html]
+title = GitLight Code Coverage
+directory = _build/htmlcov
+
+[xml]
+output = _build/coverage.xml

@@ -1,0 +1,77 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:	  netbox-rq
+# Required-Start:    networking
+# Required-Stop:     networking
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Netbox Redis Queue Worker
+# Description:       Netbox Redis Queue Worker
+### END INIT INFO
+
+# Using the lsb functions to perform the operations.
+. /lib/lsb/init-functions
+
+# Process name ( For display )
+NAME='netbox-rq'
+USER='www-data'
+
+# Daemon
+DAEMON='/opt/netbox-venv/bin/python3'
+OPTS='/srv/webapps/netbox/netbox/manage.py rqworker'
+
+# pid file for the daemon
+PIDFILE='/var/run/netbox-rq.pid'
+
+# If the daemon is not there, then exit.
+test -x "$DAEMON" || exit 5
+
+start() {
+	if [[ -e "$PIDFILE" ]]; then
+		if status_of_proc -p "$PIDFILE" "$DAEMON" "$NAME process" && status='0'; then
+			echo "$name is already running"
+			return 0
+		fi
+	fi
+
+	log_daemon_msg "Starting the process" "$NAME"
+	start-stop-daemon --start --oknodo --pidfile "$PIDFILE" --make-pidfile \
+			--chuid "$USER" --background --startas "$DAEMON" -- $OPTS
+	ret="$?"
+	log_end_msg "$ret"
+	return "$ret"
+}
+
+stop() {
+	if [[ -e "$PIDFILE" ]]; then
+		status_of_proc -p "$PIDFILE" "$DAEMON" "Stoppping the $NAME process" && status="0" || status="$?"
+		if [ "$status" == 0 ]; then
+			start-stop-daemon --stop --remove-pidfile --quiet --oknodo --pidfile "$PIDFILE"
+			rm -f "$PIDFILE"
+		fi
+	else
+		log_daemon_msg "$NAME is not running"
+		log_end_msg 0
+	fi
+}
+
+status() {
+	if [[ -e "$PIDFILE" ]]; then
+		status_of_proc -p "$PIDFILE" "$DAEMON" "$NAME process" && exit 0 || exit "$?"
+	else
+		log_daemon_msg "$NAME is not running"
+		log_end_msg 0
+	fi
+}
+
+case $1 in
+	start)   start;;
+	stop)    stop;;
+	restart) stop && start;;
+	status)  status;;
+	*)
+		echo "Usage: $0 {start|stop|restart|status}"
+		exit 2
+		;;
+esac

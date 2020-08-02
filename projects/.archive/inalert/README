@@ -1,0 +1,9 @@
+Inalert is a private project I once worked on that needed to quickly send
+out notifications to subscribers when certain messages were received. This
+was used to provide an ad-hoc alert system.
+
+This project additionally collected and aggregated the log data and
+provided an option for users to run queries. This was done using an
+ELK stack with some extremely painful regular expressions. I actually
+reached the limits of what Logstash can handle and had to break it into
+three different groups of regular expressions.

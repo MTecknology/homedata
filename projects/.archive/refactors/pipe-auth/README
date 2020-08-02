@@ -1,0 +1,9 @@
+This script is used by the jabberd2-c2s process to verify user credentials
+against an custom internal application.
+
+This was refactored because the old version was not able to handle the full
+load from production, could not cache credentials, and was very slow. It was
+rewritten to run more like a daemon than a script. Caching was originally
+built into the single-threaded process but later transitioned to redis which
+added support for shared cache between redundant systems and removed cache
+rebuild time during application startup.

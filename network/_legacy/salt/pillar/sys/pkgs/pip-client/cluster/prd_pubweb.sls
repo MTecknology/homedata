@@ -1,0 +1,3 @@
+installs:
+  - bottle-sqlalchemy
+  - sphinxalchemy

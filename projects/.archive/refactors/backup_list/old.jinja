@@ -1,0 +1,6 @@
+declare -a backuplist
+backuplist=('/etc' '/srv' '/opt')
+# Templated extra directories here...
+{% if 'backup_dirs' in pillar %}{% for bdir in pillar['backup_dirs'] %}
+backuplist+=("{{ bdir }}")
+{% endfor %}{% endif %}

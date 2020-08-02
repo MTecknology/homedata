@@ -1,0 +1,28 @@
+[ssh.upload.debian.org]
+fqdn = ssh.upload.debian.org
+method = scp
+login = mtecknology
+run_dinstall = 0
+progress_indicator = 2
+allow_insinged_uploads = 0
+incoming = /srv/upload.debian.org/UploadQueue
+
+#[ssh.security.upload.debian.org]
+#fqdn = ssh://ssh.security.upload.debian.org/srv/security.upload.debian.org/SecurityUploadQueue
+
+[mentors]
+fqdn = mentors.debian.net
+method = ftp
+incoming = .
+login = anonymous
+allow_unsigned_uploads = 0
+run_dinstall = 0
+progress_indicator = 2
+passive_ftp = 1
+
+[people]
+fqdn = people.debian.org
+method = scp
+login = *
+incoming = /home/mtecknology/public_html/debian/mini-dinstall/incoming
+post_upload_command = ssh people.debian.org mini-dinstall -b

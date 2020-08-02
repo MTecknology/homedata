@@ -1,0 +1,2 @@
+excl:
+  - '**unifi/db/*'

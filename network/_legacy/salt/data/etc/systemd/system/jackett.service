@@ -1,0 +1,17 @@
+[Unit]
+Description=Jackett Daemon
+After=network.target
+
+[Service]
+SyslogIdentifier=jackett
+Restart=always
+RestartSec=5
+Type=simple
+User=plex
+Group=plex
+WorkingDirectory=/opt/Jackett
+ExecStart=/opt/Jackett/jackett_launcher.sh
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

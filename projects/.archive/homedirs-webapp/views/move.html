@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<a href="/files">File Restore</a> | <a href="/move">File Move</a><br />
+<center>
+  <form id="move" action="/move" method="post" accept-charset="UTF-8" style="width: 360px;">
+    <fieldset>
+      <legend>File Mover</legend>
+      <table>
+        <tr>
+          <td width=140>Action:</td>
+          <td>
+            <select id="action" name="action" onchange="action_change()">
+              <option value="none">Make Selection</option>
+              <option value="namechange">Name Change</option>
+              <option value="centerchange">Center Change</option>
+              <option value="termmove">Termination Move</option>
+            </select>
+          </td>
+        </tr>
+        <tr id="curusr_row" style="display: none;">
+          <td>Current User:</td>
+          <td><input type="text" id="curusr" name="curusr" /></td>
+        </tr>
+        <tr id="curcnt_row" style="display: none;">
+          <td>Current Center:</td>
+          <td><input type="text" id="curcnt" name="curcnt" /></td>
+        </tr>
+        <tr id="newusr_row" style="display: none;">
+          <td>New User:</td>
+          <td><input type="text" id="newusr" name="newusr" /></td>
+        </tr>
+        <tr id="newcnt_row" style="display: none;">
+          <td>New Center:</td>
+          <td><input type="text" id="newcnt" name="newcnt" /></td>
+        </tr>
+        <tr id="submit_row" style="display: none;">
+          <td colspan=2><input type="submit" name="Submit" value="Submit" /></td>
+        </tr>
+      </table>
+    </fieldset>
+  </form>
+  <a href="javascript:toggle_help();">Show/Hide Help</a><br />
+  <span id="helptext" style="display: none; line-height: 1; text-align: left;">
+    <pre>
+      Order matters a lot...
+
+      Name Change / Center Change:
+        * New account must be active
+        * Must not have logged into the new account yet
+        * If asset is staying with them, it needs to be re-imaged
+
+      Termination Move:
+        * Destination user must exist and have logged in
+
+      Name Change AND Center Move:
+        * First: Center Change
+        * Second: Name Change
+
+      Retention:
+        * An inactive users data is moved to a new location after seven days
+        * An inactive users data is purged from the boothost after forty days
+        * Once data on backup system expires, data cannot be recovered.
+
+      Previous Jobs:
+        * finished [S] -- Indicates finished with success
+        * finished [F] -- Indicates failure to complete (details follow)
+          * Source does not exist! -- The users data no longer exists on the boothost (expired)
+          * Destination does not exist! -- The user files are being transferred to doesn't yet exist.
+    </pre>
+  </span>
+  <b>== Previous Jobs ==</b><br />
+  {% for job in jobs %}
+  <span id="{{ job['job_id'] }}-title" style="color: {{ job['color'] }};">{{ job['job_id'] }} @ {{ job['created_at'] }} : {{ job['status'] }} [{{ job['code'] }}]</span><br />
+  <span id="{{ job['job_id'] }}-command">{{ job['desc'] }}</span><br />
+  {% if job['result'] is iterable %}
+  <span id="{{ job['job_id'] }}-err" style="line-height: 1;"><pre>{{ job['result'][1]|replace('\n\n', '\n') }}</pre></span>
+  {% endif %}
+  {% endfor %}
+</center>
+{% endblock %}

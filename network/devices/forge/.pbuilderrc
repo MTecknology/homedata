@@ -1,0 +1,10 @@
+# Make hooks available
+HOOKDIR="/var/cache/pbuilder/hook.d"
+
+# Create both .changes files :D
+SOURCE_ONLY_CHANGES=yes
+
+# Include local debs
+OTHERMIRROR="deb [trusted=yes] file:///var/cache/pbuilder/deps ./"
+BINDMOUNTS="/var/cache/pbuilder/deps"
+EXTRAPACKAGES="apt-utils"

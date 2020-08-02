@@ -1,0 +1,55 @@
+diff --git a/top.sls b/top.sls
+index 8f95d24..55b1940 100644
+--- a/top.sls
++++ b/top.sls
+@@ -1,42 +1,15 @@
+ 'base':
+   '*':
+-    - sys.base.apt
+-    - sys.base.ferm
+-    - sys.base.snap
+-    - sys.base.sudo
+-    - sys.base.syslog
+-    - sys.base.tzdata
+-    - sys.pkgs.acmetool
+-    - sys.pkgs.versions
++    - sys.base
++    - sys.certs
++    - sys.gpg
++    - sys.pkgs
++    - sys.remotes
++    - sys.services
+     - sys.users
+-    - sys.users.ssmtp
++    - sys.vpn
+     - sys.websites
+-    - sys.certs.dhparam
+-  'apt.lustfield.net':
+-    - sys.pkgs.acng
+-  'boot.lustfield.net':
+-    - sys.pkgs.tftpd
+-    - sys.remotes
+-  'endsalt.lustfield.net':
+-    - sys.pkgs.salt
+-  'irc.lustfield.net':
+-    - sys.gpg.michael_lustfield
+   'prd-ns-*.core.lustfield.net':
+     - cloud.profiles
+-  'pbin.ngx.cc':
+-    - sys.remotes
+-  'oob-*.lustfield.net':
+-    - sys.vpn
+-  'oob-scout*.lustfield.net':
+-    - sys.pkgs.udev
+-  'pubweb*.lustfield.net':
+-    - sys.pkgs.sphinxsearch
+-    - sys.certs.mlustfield
+   'salt.lustfield.net':
+-    - sys.pkgs.salt
+-    - sys.pkgs.salt-cloud
+-  'snap.lustfield.net':
+-    - sys.services.glacier
+-  '*-netbox-*.lustfield.net':
+-    - sys.pkgs.postgresql
+-    - sys.remotes
++    - cloud

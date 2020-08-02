@@ -1,0 +1,9 @@
+{% extends "gitlight/base.html" %}
+
+{% block title %}
+    <title>GitLight - Error</title>
+{% endblock %}
+
+{% block body %}
+<span class="error_message">{{ error|safe }}</span>
+{% endblock %}

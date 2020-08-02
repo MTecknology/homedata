@@ -1,0 +1,39 @@
+Download from http://download.proxmox.com/images/system/
+
+Extract archive into dir, mount stuff, chroot.
+echo 'nameserver 10.41.7.1' >/etc/resolv.conf
+
+cat >/etc/apt/sources.list <<EOF
+deb http://apt.lustfield.net/debian stretch main contrib
+deb http://apt.lustfield.net/debsec stretch/updates main contrib
+deb http://apt.lustfield.net/debian stretch-updates main contrib
+EOF
+
+cat >/etc/apt/sources.list.d/saltstack.list <<EOF
+deb http://apt.lustfield.net/sltstk9 stretch main
+EOF
+
+apt-get install dirmngr # apparently required for the following line
+apt-key apt-key adv --keyserver keyserver.ubuntu.com --recv 0E08A149DE57BFBE
+
+apt-get update
+apt-get upgrade
+apt-get install sysvinit-core salt-minion vim
+apt-get purge xbase-clients debconf-i18n nano postfix postfix-sqlite reportbug systemd \
+	systemd-sysv tasksel-data tasksel telnet traceroute vim-tiny wamerican x11-apps \
+	x11-common x11-session-utils x11-utils x11-xkb-utils x11-xserver-utils xauth xinit
+
+apt-get autoremove
+apt-get clean
+
+echo '' >/etc/resolv.conf
+
+service salt-minion stop
+killall dirmgr
+exit
+umount d/*
+
+# make sure no files are still being held open
+rm root/.bash_history
+
+root@arctic:/home/michael/downloads/d# tar czf ../debian-9-lustfield_amd64.tar.gz *

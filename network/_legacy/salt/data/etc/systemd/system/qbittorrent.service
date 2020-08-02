@@ -1,0 +1,15 @@
+[Unit]
+Description=qBittorrent Daemon
+After=syslog.target network.target
+
+[Service]
+User=plex
+Group=plex
+Type=simple
+ExecStart=/usr/bin/qbittorrent-nox
+TimeoutStopSec=20
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

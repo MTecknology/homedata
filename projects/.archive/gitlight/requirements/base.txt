@@ -1,0 +1,5 @@
+Flask
+Flask-Login
+Jinja2
+pygit2
+pyyaml

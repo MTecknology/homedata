@@ -1,0 +1,78 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:	  bungee 
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6  
+# Short-Description: starts the bungee server
+# Description:       starts bungee using start-stop-daemon
+### END INIT INFO
+
+PATH='/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin'
+DAEMON='/usr/bin/java'
+DAEMON_OPTS='-Xms512M -Xmx512M -jar /opt/bungee/BungeeCord.jar'
+ROOT_DIR='/opt/bungee'
+PID='/run/bungee.pid'
+NAME='bungee'
+DESC='Minecraft BungeeCord Gateway'
+USER='msm'
+GROUP='msm'
+
+. /lib/init/vars.sh
+. /lib/lsb/init-functions   
+
+start_service() {
+	start-stop-daemon --start --background --chdir "$ROOT_DIR" \
+		--pidfile "$PID" --make-pidfile --exec "$DAEMON" \
+		--user "$USER" --group "$GROUP" --chuid "$USER:$GROUP" \
+		-- "$DAEMON_OPTS" #2>/dev/null
+}
+
+stop_service() {
+	start-stop-daemon --stop --pidfile "$PID" \
+		--user "$USER" --group "$GROUP"
+}
+
+case "$1" in
+	start)
+		log_daemon_msg "Starting $DESC" "$NAME"
+		start_service
+		case "$?" in
+			0) log_end_msg 0;;
+			*) log_end_msg 1;;
+		esac
+		;;
+	stop)
+		log_daemon_msg "Stopping $DESC" "$NAME"
+		stop_service
+		case "$?" in
+			0) log_end_msg 0;;
+			*) log_end_msg 1;;
+		esac
+		;;
+	restart)
+		log_daemon_msg "Restarting $DESC" "$NAME"
+		stop_bungee 
+		case "$?" in
+			0|1)
+				start_bungee
+				case "$?" in
+					0) log_end_msg 0;;
+					*) log_end_msg 1;;
+				esac
+				;;
+			*)  
+				# Failed to stop
+				log_end_msg 1
+				;;
+		esac
+		;;
+	status)
+		status_of_proc -p "$PID" "$DAEMON" "$NAME" && exit 0 || exit $?
+		;;
+	*)
+		echo "Usage: $NAME {start|stop|restart|status}" >&2
+		exit 3
+		;;
+esac

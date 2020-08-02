@@ -1,0 +1,2 @@
+hardstatus string "%{.bW}%-w%{.rW}%n %t%{-}%+w %=%{..G} $LOGNAME@%H %{..Y} %m/%d %C%a "
+hardstatus alwayslastline

@@ -1,0 +1,3 @@
+root@prd-git-01:/var/lib/gitolite3/repositories/salt/states.git# cat hooks/post-receive.h00-salt-global-highstate 
+#!/bin/sh
+sudo /usr/local/sbin/saltevent 'global' 'highstate'

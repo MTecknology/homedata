@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<center>
+  {% if errmsg %}
+  <span class="error">{{ errmsg }}</span>
+  {% else %}
+  <span class="error">Unknown Error</span>
+  {% endif %}
+</center>
+{% endblock %}

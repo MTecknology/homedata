@@ -1,0 +1,6 @@
+- sys.pkgs.nginx
+- sys.pkgs.uwsgi
+- sys.remotes
+#'*-bot-*.core.ngx.cc':
+- sys.pkgs.limnoria
+- sys.users.ngxbot

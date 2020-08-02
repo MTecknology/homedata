@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Exec=cbatticon
+Hidden=false
+X-MATE-Autostart-enabled=true
+Name[en_US]=Battery Icon
+Name=Battery Icon
+Comment[en_US]=
+Comment=

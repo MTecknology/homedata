@@ -1,0 +1,68 @@
+dev:
+    Hi, I would like to know where are the log files saved in the server for
+    [server name], [server name] and also want see the hosting files. Hope you
+    have some info about it, Please let me know.
+
+admin:
+    Are you just looking for the web server access logs?
+
+dev:
+    Kind off and hosting files.
+
+admin:
+    I’m not quite sure what you mean by hosting files. What kind of data are
+    you looking for in these files?
+
+dev:
+    Do you know about server logs.. I can make it work..
+
+dev:
+    I just want to know about webserver logs ..
+
+admin:
+    Yes I do know about the server logs. I was just curious what kind of data
+    you were looking for so I could provide access accordingly. Here is a
+    sample of the nginx access.log file. Is this what you are looking for?
+    [examples from nginx access.log provided]
+
+dev:
+    Do you know any PHP logs saved in the server  for [server name]?
+
+admin:
+    uwsgi is the package that handles PHP for the web server (Nginx). Here is
+    what the logs for that look like: [sample logs from uwsgi provided]. Are
+    either of these what you are looking for?
+
+dev:
+    How can I access them?
+
+admin:
+    I need you to actually answer my questions so I know what you are looking for.
+
+dev:
+    They should look like this one attached. When I change or update anything in
+    the code the server will automatically  create this logs.
+
+admin:
+    I found this log that was written to today that looks like it contains the
+    same type of information as the log file that you sent as an example. Does
+    this look like what are needing?
+
+dev:
+    These are the ones I am looking.. Can I have access..
+
+admin:
+    I’ll get you an account to log into [server name] and [server name] over
+    SSH. Do you need access to both “app.log” and the nginx web server access log?
+
+dev:
+    That would be great. Can we do that today ..
+
+admin:
+    Yes. I’ll get you the access in the next hour
+
+
+notes:
+    * dev tried to update admin password by pasting an unknown password hash
+      into the terminal window (the hash was the command.. that's it) 
+    * dev attempted this in varying ways before giving up and trying http updates

@@ -1,0 +1,13 @@
+domains:
+  - 'gitlight.io'
+  #- 'git.gitlight.io'
+  #- 'git-tls.gitlight.io'
+  - 'ci.gitlight.io'
+  - 'drone.gitlight.io'
+  - 'ngx.cc'
+  - 'bot.ngx.cc'
+  - 'b.ngx.cc'
+  - 'paste.ngx.cc'
+  - 'p.ngx.cc'
+  - 'ip.ngx.cc'
+  - 'i.ngx.cc'

@@ -1,0 +1,3 @@
+cowbuilder --create --basepath=/var/cache/pbuilder/base-experimental-amd64.cow --distribution=experimental
+cowbuilder --create --basepath=/var/cache/pbuilder/base-jessie-amd64.cow --distribution=jessie
+cowbuilder --create --basepath=/var/cache/pbuilder/base-sid-amd64.cow --distribution=sid

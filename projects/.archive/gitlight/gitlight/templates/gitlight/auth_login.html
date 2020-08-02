@@ -1,0 +1,14 @@
+{% extends "gitlight/base.html" %}
+
+{% block title %}
+    <title>GitLight - Log In</title>
+{% endblock %}
+
+{% block body %}
+<form method="post" name="login">
+  <input type="text" name="user" value="" placeholder="Username">
+  <br /><input type="password" name="pass" value="" placeholder="Password">
+  <br /><label><input type="checkbox" name="memberberries" value="Remember Me" />Remember Me</label>
+  <br /><input type="submit" name="submit_login" value="Log In">
+</form>
+{% endblock %}

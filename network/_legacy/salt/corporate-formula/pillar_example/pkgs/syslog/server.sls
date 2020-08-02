@@ -1,0 +1,2 @@
+syslog:
+  logconf: server

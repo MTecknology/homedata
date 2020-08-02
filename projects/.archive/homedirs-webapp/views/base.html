@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    {% if title %}
+    <title>{% block title %}File Management{% endblock %}</title>
+    {% else %}
+    <title>File Management</title>
+    {% endif %}
+    <meta name="keywords" content="nginx, ngx, pastebin" />
+    <meta name="description" content="ngx cc pastebin service" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/vnd.microsoft.icon" />
+    <link type="text/css" rel="stylesheet" href="/static/css/site.css" media="all" />
+    <script type="text/javascript" src="/static/js/site.js"></script>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <div id="wrapper">
+      <table>
+        <tr><td>
+          <img src="/static/images/logo.jpg" alt="GSS Logo">
+          <span style="float: right;"><a href="/logout">Log Out</a></span>
+        </td></tr>
+        <tr class="bar"><td>
+          <span>GSS File Management</span><br />
+        </td></tr>
+        <tr><td>
+          {% block body %}{% endblock %}<br />
+        </td></tr>
+        <tr><td class="bar">
+          <span>For assistance, please contact CFS at 1-877-447-7237.</span><br />
+        </td></tr>
+      </table>
+    </div>
+  </body>
+</html>

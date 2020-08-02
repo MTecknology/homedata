@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title>BH Status</title>
+    <script type="text/javascript">
+      function toggle(id) {
+        var e = document.getElementById(id);
+        if (e.style.display == 'none') {
+           e.style.display = 'table-row';
+        } else {
+           e.style.display = 'none';
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <th align="left">Service</th>
+        <th align="left">Description</th>
+        <th align="left">Status</th>
+      </tr>
+      {% for result in results %}
+      <tr id="{{ result['title'] }}">
+        <td><a href="#" onclick="toggle('{{ result['title'] }}-details')">{{ result['title'] }}</a></td>
+        <td>{{ result['description'] }}</td>
+        {% if result['status'] == 'good' %}
+        <td><span style="color: #008000;">GOOD</span></td>
+        {% elif result['status'] == 'warn' %}
+        <td><span style="color: #A79600;">WARN</span></td>
+        {% else %}
+        <td><span style="color: #FF0000;">ERROR</span></td>
+        {% endif %}
+      </tr>
+      <tr id="{{ result['title'] }}-details" style="display: none">
+        <td colspan="3"><pre>{{ result['details'] }}</pre></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+nginx:
+  sites:
+    - saneapp
+    - subapp

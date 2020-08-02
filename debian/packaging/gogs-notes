@@ -1,0 +1,136 @@
+= Create on Alioth =
+
+ssh git.debian.org "/git/pkg-go/setup-repository golang-github-gogits-cron 'Packaging for golang-github-gogits-cron'"
+
+= Initial Packaging =
+
+dh-make-golang -t library github.com/gogits/cron
+vim itp-golang-github-gogits-cron.txt
+  License: MIT => Expat
+  Description: improvify
+sudo sendmail -t < itp-golang-github-gogits-cron.txt
+rm itp-golang-github-gogits-cron.txt
+cd golang-github-gogits-cron
+vim debian/control
+  Standards-Version: 3.9.8
+  Vcs-Git: https://<line_above>
+  Description: improvify
+grep -i copyright . -R
+vim copyright
+  TODO -> Expat
+  MIT => Expat *ALWAYS*
+  Add anything that isn't an exact match.
+vim debian/changelog
+  TODO -> <itp>
+  Include '#' in bug number
+echo README.md > debian/docs
+git add debian
+git commit -a -m 'Initial packaging'
+pristine-tar commit ../golang-github-gogits-cron_0.0~git20160810.32.7f3990a.orig.tar.xz
+
+= Test Build =
+
+build-unstable
+
+= Push to Alioth =
+
+git push git+ssh://git.debian.org/git/pkg-go/packages/golang-github-gogits-cron.git --tags master pristine-tar upstream
+
+
+= To strip binaries
+
+debian/rules::
+
+    override_dh_auto_install:
+    	dh_auto_install
+    	# Binary files need more love before being fit for distribution
+    	$(RM) -r $(CURDIR)/debian/$(shell dh_listpackages)/usr/bin
+
+
+= To disable tests =
+
+debian/rules::
+
+    # Tests attempt to reach out to web services.
+    override_dh_auto_test:
+
+See golang-github-jaytaylor-html2text about a patch that can make tests work.
+
+
+= misc =
+
+git commit -am 'Finalize d/changelog for release'
+
+= Upload new revision =
+
+If upstream does not create release tarballs:
+Use dh-make-golang to grab a new .tar.xz
+gbp import-orig # will auto-gen new revision
+pristine-tar commit
+dch -v <new revision>-1
+build-unstable --git-pbuilder-options=--source-only-changes
+  # Or  SOURCE_ONLY_CHANGES=yes  in ~/.pbuilderrc
+gbp buildpackage --git-tag --git-tag-only
+git push --all
+git push --tags
+
+.. for a specific branch..
+
+https://github.com/gopherjs/gopherjs/commits/go1.7
+dh-make-golang -type library -git_revision d5c6ba6916a7 github.com/gopherjs/gopherjs
+pristine-tar commit ../*xz
+git branch -l upstream-go1.7 upstream
+gbp import-orig --upstream-branch=upstream-go1.7 ../golang-github-gopherjs-gopherjs_0.0~git20170216.0.d5c6ba6.orig.tar.xz
+build-unstable --git-upstream-branch=upstream-go1.7
+
+
+= dfsg =
+
+(probably documented elsewhere)
+Files-Excluded: in header of d/copyright
+build-unstable; ^c # just need *.xz
+mk-origtargz --compression xz ../golang-github-gogits-chardet_0.0~git20150115.0.2404f77.orig.tar.xz
+mv ../<foo>.orig.tar.xz ../<foo>+dfsg.orig.tar.xz
+pristine-tar commit ../*+dfsg.orig.tar.xz
+git branch -l upstream+dfsg upstream
+gbp import-orig --upstream-branch=upstream+dfsg ../*+dfsg.orig.tar.xz
+dch -e
+build-unstable --git-upstream-branch=upstream+dfsg
+
+
+= checklist =
+
+pristine-tar
+d/docs
+copyright headings
+license
+extra license files
+name
+match name on bsd-3-clause and apache-2.0
+dch -r
+git tag
+
+
+sbuild
+------
+
+https://wiki.debian.org/sbuild
+
+apt-get install sbuild
+sbuild-adduser michael
+sbuild-createchroot --include=eatmydata,ccache,gnupg unstable /srv/chroot/unstable-amd64-sbuild http://httpredir.debian.org/debian
+sbuild-createchroot --include=eatmydata,ccache,gnupg testing /srv/chroot/testing-amd64-sbuild http://httpredir.debian.org/debian
+
+ratt
+----
+
+requires sbuild
+
+ratt -sbuild_dist testing golang-go.crypto_0.0~git20170407.0.55a552f-1_amd64.changes
+
+---
+misc
+---
+
+grep-dctrl -FBuild-Depends golang-go.crypto-dev -sPackage /var/lib/apt/lists/*Sources
+

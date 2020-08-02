@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [[ "$2" == 'highstate' ]]; then
+	case "$1" in
+		'pubweb') host='*-pubweb-';;
+		'ngx') host='*-ngx-';;
+		'salt') host='salt';;
+		'global') host='global';;
+		'glight') host='*core.gitlight';;
+		*) exit 1;;
+	esac
+	if [[ "$3" ]]; then
+		salt-call event.fire_master "{'host': $host, 'action': 'highstate', 'env': $3}" 'highstate_request'
+	else
+		salt-call event.fire_master "{'host': $host, 'action': 'highstate'}" 'highstate_request'
+	fi
+
+elif [[ "$2" == 'tab' && "$3" ]]; then
+        salt-call event.fire_master "{'host': 'tab', 'action': 'start_countdown', 'data': \"$3\"}" 'netbox_update'
+
+fi

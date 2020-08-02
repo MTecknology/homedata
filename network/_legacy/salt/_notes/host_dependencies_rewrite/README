@@ -1,0 +1,3 @@
+This was part of an effort to turn a client's large statically-defined shared
+pillar object into a secure, light-weight, and dynamically-generated object
+from salt mine.

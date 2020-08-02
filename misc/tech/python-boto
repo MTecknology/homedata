@@ -1,0 +1,46 @@
+##
+# Python Boto
+# .. Usage
+# http://boto.cloudhackers.com/en/latest/ref/glacier.html
+##
+
+
+>>> import boto.glacier
+>>> r = boto.glacier.connect_to_region('us-east-1')
+>>> r.list_vaults()
+[Vault("arn:aws:glacier:us-east-1:097309656748:vaults/snap")]
+>>> v = r.get_vault('snap')
+
+>>> v.retrieve_inventory()
+'TdOLwMH1crQHd_BxbLdsmPw37em5zWCHhUBKqQog6dm3T8gAcO6VHcx5QLpFLn4VTzVOdgZL-cavLF9p0i9bHKKO0DUX'
+## wait up to four hours
+
+>>> v.list_jobs()
+[Job(arn:aws:glacier:us-east-1:097309656748:vaults/snap)]
+>>> j = v.get_job('TdOLwMH1crQHd_BxbLdsmPw37em5zWCHhUBKqQog6dm3T8gAcO6VHcx5QLpFLn4VTzVOdgZL-cavLF9p0i9bHKKO0DUX')
+>>> j.get_output()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/usr/lib/python2.7/dist-packages/boto/glacier/job.py", line 89, in get_output
+    byte_range)
+  File "/usr/lib/python2.7/dist-packages/boto/glacier/layer1.py", line 740, in get_job_output
+    response_headers=response_headers)
+  File "/usr/lib/python2.7/dist-packages/boto/glacier/layer1.py", line 119, in make_request
+    raise UnexpectedHTTPResponseError(ok_responses, response)
+boto.glacier.exceptions.UnexpectedHTTPResponseError: Expected (200, 206), got (400, {"code":"InvalidParameterValueException","message":"The job is not currently available for download: TdOLwMH1crQHd_BxbLdsmPw37em5zWCHhUBKqQog6dm3T8gAcO6VHcx5QLpFLn4VTzVOdgZL-cavLF9p0i9bHKKO0DUX","type":"Client"})
+
+
+>>> import pprint
+>>> j = v.get_job('vB1xU4hvU2V__I9zAFaBtKWax9Nx31TPmLYMtQHOaPuZdorawr03XIHJyiZObjDXm9Ixwse-smaSnU1wcoWCgtFKpOHU')
+>>> pprint.pprint(j.get_output())
+
+                  {u'ArchiveDescription': u'snap-2016-09-07.crypt',
+                   u'ArchiveId': u'ncKIdrjXExGx9Mt5q0W_cj0ZQ11r8enM1BClna2gH8vKnDLyvuKACfuav10GVJMWcjyBczlkMrLH3br1dx94UQr7_cTUNaDSXdmtNZibRX0aKLgOxdxbK7efHkw3LBMmkPfE7AVaSg',
+                   u'CreationDate': u'2016-09-07T10:16:06Z',
+                   u'SHA256TreeHash': u'1e23c72a69a9edc19d9fb7a171794fd7a434202201c261808ccc773091c61bd9',
+
+
+>>> v.retrieve_archive('ncKIdrjXExGx9Mt5q0W_cj0ZQ11r8enM1BClna2gH8vKnDLyvuKACfuav10GVJMWcjyBczlkMrLH3br1dx94UQr7_cTUNaDSXdmtNZibRX0aKLgOxdxbK7efHkw3LBMmkPfE7AVaSg')
+Job(arn:aws:glacier:us-east-1:097309656748:vaults/snap)
+
+

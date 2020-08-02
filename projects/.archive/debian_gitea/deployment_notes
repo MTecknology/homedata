@@ -1,0 +1,73 @@
+debgit-stor01.lustfield.net
+138.197.209.68
+2604:a880:2:d0::4d8d:a001
+10.138.152.216
+
+debgit-web01.lustfield.net
+138.68.49.247
+2604:a880:2:d0::4d8d:8001
+10.138.152.212
+
+debgit-web02.lustfield.net
+138.197.222.49
+2604:a880:2:d0::4d8d:9001
+10.138.152.214
+
+all:
+apt-get install vim ferm sshguard
+useradd -s /bin/false 
+groupadd -r -g 780 gitea
+useradd -r -M -g 780 -u 780 -s /bin/false -d /srv/gitea gitea
+mkdir /srv/gitea/{certs,repos} -p
+chown gitea:gitea /srv/gitea/repos
+
+
+stor:
+apt-get install mariadb-server redis-server nfs-kernel-server
+mkfs.ext4 /dev/disk/by-id/scsi-0DO_Volume_debgit-data
+echo '/dev/disk/by-id/scsi-0DO_Volume_debgit-data /srv ext4 defaults,nofail,discard 0 0' >> /etc/fstab
+mount /srv
+echo '/srv/gitea 10.138.152.216(rw,root_squash,subtree_check) 10.138.152.214(rw,root_squash,subtree_check)' >>/etc/exports
+exportfs -a
+service nfs-kernel-server restart
+sed -i 's/bind 127.0.0.1/bind 0.0.0.0/' /etc/redis/redis.conf
+service redis-server restart
+sed -i 's/= 127.0.0.1/= 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
+service mysql restart
+mysql -uroot
+  CREATE USER 'gitea'@'10.138.152.212' IDENTIFIED BY 'GrMPIMGLYsBi5T7edEosFj3ayNxJXXGAYejX';
+  CREATE USER 'gitea'@'10.138.152.214' IDENTIFIED BY 'GrMPIMGLYsBi5T7edEosFj3ayNxJXXGAYejX';
+  GRANT ALL PRIVILEGES ON gitea.* TO 'gitea'@'10.138.152.212';
+  GRANT ALL PRIVILEGES ON gitea.* TO 'gitea'@'10.138.152.214';
+  CREATE DATABASE gitea;
+  FLUSH PRIVILEGES;
+
+web:
+apt-get install nginx nfs-client git sendmail
+echo '10.138.152.216:/srv/gitea /mnt/gitea nfs rw,async,hard,intr 0 0' >>/etc/fstab
+mkdir /mnt/gitea
+mount /mnt/gitea
+# build gitea on different box:
+  https://docs.gitea.io/en-us/install-from-source/#build
+  drop in /srv/gitea
+## nginx config
+#TODO
+## end nginx conf
+install:
+  10.138.152.216:3306
+  gitea : <pass>
+  misteradmin: 1Ldbb47PtN9KBXT2dljIp0lmbYm
+    tok=b3c1a8e5099296ffff0135e05ee73a3f1d3b270e
+
+apt-get install acmetool
+acmetool --xlog.stderr want gitea.debian.net
+crontab -e
+  /usr/bin/acmetool; /usr/sbin/service nginx reload
+
+# create: www-data:www-data /srv/gitea/acme on stor
+
+wget https://anonscm.debian.org/cgit/debian-sso/debian-sso.git/plain/update-debsso-ca -O /usr/local/sbin/update-debsso-ca
+chmod +x /usr/local/sbin/update-debsso-ca
+crontab -e
+  @daily /usr/local/sbin/update-debsso-ca --destdir /etc/nginx/ssl/; /usr/sbin/service nginx reload
+

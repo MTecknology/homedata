@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<a href="/files">File Restore</a> | <a href="/move">File Move</a><br />
+<form id="move" action="/files" method="post" accept-charset="UTF-8">
+  <fieldset>
+    <legend>File Restore - Confirm File Restoration</legend>
+    Please, confirm that these files are what you want to restore.</br />
+    You will receive an email notification when the restore is complete.<br /><br />
+    Note: The "In Place" checkbox indicates files will be restored exactly where they were.<br />
+    Unchecking this box will put files in a zip archive on your desktop.<br /><br />
+    <pre>{% for file in files %}{{ file['trimmed'] }}<input type="hidden" id="{{ file['name'] }}" name="files" value="{{ file['name'] }}" /><br />{% endfor %}</pre>
+    <input type="checkbox" id="in_place" name="in_place" checked="checked" /><label for="in_place">In Place</label><br />
+    <input type="submit" name="accepted" value="cancel" />&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="accepted" value="restore" />
+  </fieldset>
+</form>
+{% endblock %}

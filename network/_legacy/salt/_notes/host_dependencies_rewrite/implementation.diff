@@ -1,0 +1,25 @@
+$ git diff
+diff --git a/pillar/top.sls b/pillar/top.sls
+index 114b598..76b6fe3 100644
+--- a/pillar/top.sls
++++ b/pillar/top.sls
+@@ -3,7 +3,6 @@ base:
+     - users.user_groups
+     - users.system
+     - nodes
+-    - nodes.host_dependencies
+     - vault.collectd
+     - header
+     - vault.monitoring
+diff --git a/states/sensu/client.sls b/states/sensu/client.sls
+index 94a7866..c223b39 100644
+--- a/states/sensu/client.sls
++++ b/states/sensu/client.sls
+@@ -7,7 +7,7 @@
+ {% if not grains.get('vagrant', false) or force_install %}
+ 
+ {%- set roles = salt['pillar.get']("nodes:" + grains['id'] + ":roles", {}) -%}
+-{%- set host_dependencies = salt['pillar.get']('host_dependencies', []) -%}
++{%- set host_dependencies = salt.st_util.host_dependencies() -%}
+ 
+ {% if grains['os'] in [...] %}

@@ -1,0 +1,38 @@
+#!/usr/bin/python
+'''
+This module creates the 'syndic_masters' pillar value which is a list of syndic
+servers that the minion should be connecting to.
+
+This module assumes > 2 syndic boxes and all syndics use the name salt-syndic*.
+'''
+
+import salt.config
+import salt.key
+
+
+def __virtual__():
+    return 'syndic_masters'
+
+
+def ext_pillar(minion_id, pillar, *args, **kwargs):
+    minion_hash = djbhash(minion_id)
+    opts = salt.config.master_config('/etc/salt/master')
+    skey = salt.key.Key(opts)
+
+    syndics = [x for i, x in enumerate(skey.list_status('acc')['minions']) if x.startswith('salt-syndic')]
+
+    if not syndics or len(syndics) <= 2:
+        # We're choosing two syndics, so we need a minimum of two syndics.
+        return {}
+
+    syndic_one = syndics[minion_hash % len(syndics)]
+    syndic_two = syndics[(minion_hash + 1) % len(syndics)]
+
+    return {'syndic_masters': [syndic_one, syndic_two]}
+
+
+def djbhash(s):
+    h = 5381
+    for c in s:
+        h = 33 * h + ord(c)
+    return h

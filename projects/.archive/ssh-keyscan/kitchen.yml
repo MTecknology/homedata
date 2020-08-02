@@ -1,0 +1,78 @@
+<% require 'erb' %>
+---
+driver:
+  name: vagrant
+  <% if File.exist?(File.expand_path('~/.config/juniper_vcenter_creds')) %>
+  vagrantfile_erb: <%= File.expand_path('~/testing-utils/VagrantfileCustom.erb') %>
+  provider: vsphere
+  box: 'sharpie/dummy'
+  vsphere_host: <%= File.read(File.expand_path('~/.config/juniper_vcenter_creds')).strip.split(/\n/).grep(/host/).first.split('=').last.strip %>
+  vsphere_network: <%= File.read(File.expand_path('~/.config/juniper_vcenter_creds')).strip.split(/\n/).grep(/network/).first.split('=').last.strip %>
+  vsphere_datacenter: <%= File.read(File.expand_path('~/.config/juniper_vcenter_creds')).strip.split(/\n/).grep(/datacenter/).first.split('=').last.strip %>
+  vsphere_cluster: <%= File.read(File.expand_path('~/.config/juniper_vcenter_creds')).strip.split(/\n/).grep(/cluster/).first.split('=').last.strip %>
+  vsphere_folder: <%= File.read(File.expand_path('~/.config/juniper_vcenter_creds')).strip.split(/\n/).grep(/cicd_dir/).first.split('=').last.strip %>
+  vsphere_user: <%= File.read(File.expand_path('~/.config/juniper_vcenter_creds')).strip.split(/\n/).grep(/user/).first.split('=').last.strip %>
+  vsphere_passwd: <%= File.read(File.expand_path('~/.config/juniper_vcenter_creds')).strip.split(/\n/).grep(/pass/).first.split('=').last.strip %>
+  <% end %>
+
+provisioner:
+  name: chef_zero
+  product_name: chef
+  product_version: 13
+
+platforms:
+<% if File.exist?(File.expand_path('~/.config/juniper_vcenter_creds')) %>
+<%= ERB.new(File.read(File.expand_path('~/testing-utils/kitchen-snippets/esxi-platforms.snippet'))).result %>
+<% else %>
+<%= ERB.new(File.read(File.expand_path('~/testing-utils/kitchen-snippets/platforms.snippet'))).result %>
+<% end %>
+
+verifier:
+  name: inspec
+
+suites:
+  - name: shell
+    run_list:
+      - recipe[keyscan_test::shell]
+    attributes:
+      jnpr:
+        <% if ENV.key?('USE_EMERGE') %>
+        repo: "emerge"
+        <% else %>
+        repo: "stable"
+        <% end %>
+    verifier:
+      inspec_tests:
+        - test/integration/shell_tests
+    driver:
+      synced_folders:
+        - ['./', '/test_local_files/juniper/keyscan', 'type: :rsync']
+      vagrantfile_erb: "~/testing-utils/VagrantfileCustom.erb"
+
+  - name: python
+    run_list:
+      - recipe[keyscan_test::python]
+    attributes:
+      jnpr:
+        <% if ENV.key?('USE_EMERGE') %>
+        repo: "emerge"
+        <% else %>
+        repo: "stable"
+        <% end %>
+    verifier:
+      inspec_tests:
+        - test/integration/python_tests
+    driver:
+      synced_folders:
+        - ['./', '/test_local_files/juniper/keyscan', 'type: :rsync']
+      vagrantfile_erb: "~/testing-utils/VagrantfileCustom.erb"
+    excludes:
+      <% ['bento', 'cicd', 'vc'].each do |p| %>
+      - ubuntu-12.04-<%= p %>
+      - ubuntu-14.04-<%= p %>
+      - centos-5-<%= p %>
+      - centos-6-<%= p %>
+      - centos-7-<%= p %>
+      - freebsd-10-<%= p %>
+      - freebsd-11-<%= p %>
+      <% end %>

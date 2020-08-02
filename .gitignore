@@ -1,0 +1,27 @@
+# Build Things
+**/pkg_maint
+
+# Private Repo Data
+.private
+
+# Resume Stuff
+*.log
+output
+
+# Python / Flask / Bottle / Vagrant Stuff
+_build
+docs/ref/**
+conf/*
+!conf/testing
+!conf/development
+!conf/production
+**/.vagrant/*
+!.vagrant/bootstrap
+*.py[co]
+*.sw
+*~
+*.wp*
+*#
+*.DS_Store
+.pytest_cache
+Pipfile.lock

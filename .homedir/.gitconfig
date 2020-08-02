@@ -1,0 +1,12 @@
+[user]
+	name = Michael Lustfield
+	email = michael@lustfield.net
+	signingkey = 06CD63D74D598C4A47E42C9603A8891A765AD085
+[push]
+	default = simple
+[core]
+	quotepath = false
+[http]
+	sslverify = true
+#[commit]
+#	gpgsign = true
