@@ -48,9 +48,10 @@ build() {
 		--git-arch="$arch" "$@"
 }
 update_builders() {
-	for arch in i386 amd86; do
+	for arch in i386 amd64; do
 		for suite in experimental unstable stable; do
-			cowbuilder --update --override-config \
+			sudo cowbuilder --update --override-config \
+				--basepath="/var/cache/pbuilder/base-$suite-$arch.cow" \
 				--distribution="$suite" \
 				--architecture "$arch"
 		done
