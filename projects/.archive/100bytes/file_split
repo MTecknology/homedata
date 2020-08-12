@@ -4,58 +4,36 @@ This is a fun little brain teaser to find the most elegant way to
 iteratively read chunks of data from an input file and then spit
 them out into individual output (per-chunk) files, splitting lines
 based on "word" termination.
-
-Assumption(s):
-- A "word" is defined as any alpha chars between non-alpha chars.
 '''
 import os
 import sys
 import argparse
+import textwrap
 
 
 def main():
     '''Primary script logic'''
     opts = get_opts()
-    max_size = int(opts.max_size)
 
     # Ensure output directory exists
     os.makedirs(os.path.dirname(opts.output), exist_ok=True)
 
-    with open(opts.input, 'rb') as _input:
-
+    # Split file and write output files
+    with open(opts.input, 'r') as fh:
         file_number = 0
-        # Read chunk; over-read by one byte for evaluation
-        for chunk in read_chunks(_input, max_size + 1):
-            chunk_s = chunk.decode('utf-8')
-            output_file = '{}.{}'.format(opts.output, file_number)
+        for chunk in textwrap.TextWrapper(width=int(opts.max_size)).wrap(fh.read()):
+            write_file(f'{opts.output}.{file_number}', chunk)
             file_number += 1
-
-            # If chunk is less than max_size, then EoF was reached
-            if len(chunk) < max_size:
-                write_file(output_file, chunk_s)
-                break
-            # Re-wind over-read bytes
-            _input.seek(-1, 1)
-
-            # If last char is not alpha, then write file
-            if not chunk_s[-1].isalpha():
-                write_file(output_file, chunk_s[:-1])
-                continue
-
-            # Find the right-most non-alpha char
-            index = find_last_nonalpha(chunk_s)
-
-            # No non-alpha chars found
-            if not index:
-                write_file(output_file, chunk_s[:-1])
-                continue
-
-            # Re-wind to last non-alpha character
-            _input.seek(-(len(chunk) - index - 2), 1)
-            write_file(output_file, chunk_s[:index + 1])
 
     # Ensure all files have finished writing to disk
     os.sync()
+
+
+def write_file(path, s):
+    '''Write string to file path without blocking for sync.'''
+    _fh = os.open(path, os.O_CREAT | os.O_WRONLY)
+    os.write(_fh, bytes(s, encoding='utf8'))
+    os.close(_fh)
 
 
 def get_opts():
@@ -87,32 +65,6 @@ def get_opts():
             help='Output path/prefix (default: output)',
             default='100')
     return parser.parse_args()
-
-
-def find_last_nonalpha(s):
-    '''Find right-most non-alpha character and return the index'''
-    for i in range(len(s) - 1, 0, -1):
-        # If "word" is defined by alpha surrounded by space...
-        # if s[i] in [' ', '\n']:
-        if not s[i].isalpha():
-            return i
-    return None
-
-
-def read_chunks(file_object, chunk_size=1024):
-    '''Generator to read a file in <chunk_size> bytes.'''
-    while True:
-        data = file_object.read(chunk_size)
-        if not data:
-            break
-        yield data
-
-
-def write_file(path, s):
-    '''Write string to file path without blocking for sync.'''
-    _fh = os.open(path, os.O_CREAT | os.O_WRONLY)
-    os.write(_fh, bytes(s, encoding='utf8'))
-    os.close(_fh)
 
 
 if __name__ == '__main__':
