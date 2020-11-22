@@ -27,7 +27,7 @@
     foreground_color = "#b5b5b5"
     scrollbar_position = hidden
     scrollback_infinite = True
-    palette = "#000000:#cd0000:#00cd00:#cdcd00:#1e90ff:#cd00cd:#00cdcd:#e5e5e5:#4c4c4c:#ff0000:#00ff00:#ffff00:#4682b4:#b82adc:#4fcad2:#ffffff"
+    palette = "#000000:#cd0000:#00cd00:#cdcd00:#014461:#cd00cd:#00cdcd:#e5e5e5:#4c4c4c:#ff0000:#00ff00:#ffff00:#4682b4:#b82adc:#4fcad2:#ffffff"
     use_system_font = False
   [[sunlight]]
     background_color = "#fbf1c7"

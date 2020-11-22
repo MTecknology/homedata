@@ -8,5 +8,5 @@
 	quotepath = false
 [http]
 	sslverify = true
-#[commit]
-#	gpgsign = true
+[commit]
+	gpgsign = true
