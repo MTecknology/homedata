@@ -7,13 +7,13 @@ and securely upload results to sharepoint.
 Source Code
 -----------
 
-Source code for the scanner is available at `gitlab/sunrise/ssh-keyscan`_.
+Source code for the scanner is available at `gitlab/foo/ssh-keyscan`_.
 
 To grab a copy of this source::
 
     git clone https://git.domain.tld/ssh-keyscan.git /opt/ssh-keyscan
 
-.. _gitlab/sunrise/ssh-keyscan: https://git.domain.tld/ssh-keyscan
+.. _gitlab/foo/ssh-keyscan: https://git.domain.tld/ssh-keyscan
 
 Scanning Nodes
 --------------
