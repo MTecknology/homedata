@@ -1,0 +1,89 @@
+#!/bin/bash
+##
+# Set up a vagrant instance for development.
+##
+#set -x
+
+##
+# Main
+##
+
+main() {
+	install_deps  || die 'Unable to install package dependencies.'
+	prep_home     || die 'Unable to configure home environment.'
+	update_system || die 'Unable to update systems.'
+	user_files    || die 'Unable to create user files.'
+	touch /.configured
+}
+
+##
+# Main functions
+##
+
+prep_home() {
+	# Basic profile / Virtualenv
+	sv cat >>/home/vagrant/.bashrc <<-EOF
+		PS1='\[\033[01;33m\]\u\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+		EOF
+	# git clone
+	# ln [...]
+}
+
+update_system() {
+	apt-get update
+	DEBIAN_FRONTEND=noninteractive apt-get -yq \
+		-o Dpkg::Options::="--force-confdef" \
+		-o Dpkg::Options::="--force-confold" \
+		dist-upgrade || return 1
+	apt-get -y autoremove
+}
+
+install_deps() {
+	apt-get update
+
+	# pip, venv
+	DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+		vim screen build-essential cowbuilder devscripts git-buildpackage \
+		gnupg2 git pristine-tar debhelper lintian quilt dh-python
+}
+
+user_files() {
+	mkdir -p /var/cache/pbuilder/deps 
+	ln -s /var/cache/pbuilder/deps ~/.pbuild_pkgs
+
+	# Link config files
+	for path in .dput.cf .gbp.conf .gitconfig .pbuilderrc .quiltrc .sbuildrc \
+			.bashrc .bash_aliases \
+			.ssh/id_ed25519.pub .ssh/id_ed25519; do
+		ln -s "/home/vagrant/.sync/$path" "/home/vagrant/$path"
+	done
+
+	# Generate build images
+	for arch in i386 amd64; do
+		for suite in experimental unstable stable; do
+			sudo cowbuilder --create \
+				--basepath="/var/cache/pbuilder/base-$suite-$arch.cow" \
+				--distribution="$suite" \
+				--architecture "$arch"
+		done
+	done
+}
+
+##
+# Helper Functions
+##
+
+die() {
+	[[ "$*" ]] && printf '*** %s ***' "$*"
+	exit 1
+}
+
+sv() {
+	sudo -u vagrant $@
+}
+
+##
+# Run main()
+##
+
+main
