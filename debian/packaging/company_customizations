@@ -1,0 +1,85 @@
+Company Customizations
+======================
+
+When a company wants to maintain a customized version of a debian/ubuntu
+package, it is often helpful to start with fresh/pristine packaging. This
+avoids extra objects and data that would create tech debt within the
+orginizations maintenance efforts.
+
+Disclaimer: These notes target customizations of Nginx on Ubuntu-18.04.
+
+References:
+
+- https://wiki.debian.org/PackagingWithGit
+- https://packages.debian.org/search?keywords=git-buildpackage
+
+Initial Environment
+-------------------
+
+Grab the current distro-maintained package data:
+
+- Enable apt-src lines in sources.list
+- apt-get update
+- apt-get source nginx
+
+Grab a copy of the latest stable upstream release:
+
+- wget http://nginx.org/download/nginx-1.18.0.tar.gz
+
+Create a starting point:
+
+- mkdir nginx
+- cd nginx
+- git init
+- gbp import-orig --pristine-tar ../nginx-1.18.0.tar.gz
+
+Initial Packaging
+-----------------
+
+Use $current_packaging as a starting point:
+
+- cp -R ../nginx-1.14.0/debian ./
+
+- Clean up (simplify) d/rules
+- Remove d/nginx-*.*
+- Add d/nginx-lpi.* (easiest copied from -full)
+- Trim extra stuff from d/control
+- Add custom package (and remove others) in d/control
+
+Verify Status
+-------------
+
+Build with:
+
+- gbp buildpackage --git-pbuilder --git-dist=bionic --git-arch=amd64
+
+Integrity Check:
+
+- lintian -EviIL +pedantic ../*.dsc
+
+Customizations
+--------------
+
+Add module:
+
+- cd debian/modules
+- git submodule add git@github.llnw.net:llnw-lpi/ngx-lpi.git llnw-lpi
+- vim README.Modules-versions
+
+Add patch:
+
+- quilt new 001-llnw-lpi.patch
+- quilt add src/http/ngx_http_core_module.* src/http/ngx_http_parse.c src/http/ngx_http_request.h src/http/ngx_http_request_body.c
+- patch -p1 <../patch
+- quilt refresh
+- quilt pop -a
+- git add debian/patches
+- vim debian/rules # add module to configure arguments
+
+Future Updates
+--------------
+
+- gbp import-orig ../nginx-X.tar.gz
+- vim debian/changelog
+- git commit [...]
+- gbp buildpackage --git-pbuilder --git-dist=bionic --git-arch=amd64

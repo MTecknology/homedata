@@ -11,7 +11,7 @@
 main() {
 	install_deps  || die 'Unable to install package dependencies.'
 	prep_home     || die 'Unable to configure home environment.'
-	update_system || die 'Unable to update systems.'
+	#update_system || die 'Unable to update systems.'
 	user_files    || die 'Unable to create user files.'
 	touch /.configured
 }

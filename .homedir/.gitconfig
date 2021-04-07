@@ -6,7 +6,10 @@
 	default = simple
 [core]
 	quotepath = false
+	editor = vim
 [http]
 	sslverify = true
 [commit]
 	gpgsign = true
+[pull]
+	rebase = true

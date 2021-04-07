@@ -1,7 +1,7 @@
 #!/bin/sh
 
 compton &
-openrazer-daemon &
+#openrazer-daemon &
 #synclient PalmDetect=1 &
 #synclient PalmMinWidth=1 &
 #nvidia-settings --load-config-only &
@@ -9,9 +9,9 @@ openrazer-daemon &
 
 feh --bg-scale /home/michael/.wallpaper.png &
 stalonetray -p --dockapp-mode &
-redshift-gtk &
+#redshift-gtk &
 pulseaudio &
-cbatticon &
+#cbatticon &
 #mate-volume-control-applet &
 
 #thunar --daemon &

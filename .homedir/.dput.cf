@@ -1,6 +1,6 @@
 [ssh.upload.debian.org]
 fqdn = ssh.upload.debian.org
-method = scp
+method = sftp
 login = mtecknology
 run_dinstall = 0
 progress_indicator = 2
@@ -22,7 +22,7 @@ passive_ftp = 1
 
 [people]
 fqdn = people.debian.org
-method = scp
+method = sftp
 login = *
 incoming = /home/mtecknology/public_html/debian/mini-dinstall/incoming
 post_upload_command = ssh people.debian.org mini-dinstall -b
