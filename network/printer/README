@@ -1,0 +1,13 @@
+cp etc_udev_rules.d_60-brother-brscan4-libsane-type1.rules \
+	/etc/udev/rules.d/60-brother-brscan4-libsane-type1.rules
+chown root:root /etc/udev/rules.d/60-brother-brscan4-libsane-type1.rules
+udevadm control --reload-rules && udevadm trigger
+
+apt install system-config-printer
+dpkg -i brother-udev-rule-type1-1.0.2-0.all.deb
+dpkg -i brscan*
+apt install -f
+
+brsaneconfig4 -a name=print model=HL-3290CDW ip=10.41.3.80
+
+apt install simple-scan
