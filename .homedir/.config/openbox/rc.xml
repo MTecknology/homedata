@@ -214,19 +214,14 @@
         <execute>terminator -u -m -b -T irssi -x ssh michael@irc.lustfield.net -t screen -aAdr -RR irssi irssi</execute>
       </action>
     </keybind>
-    <keybind key="W-n">
-      <action name="Execute">
-        <execute>rxvt --geometry 100x1+300+300 +sb -fn 9x15 -bg black -fg grey -T Notes -e /bin/dash -c 'read -p "Note: " note &amp;&amp; echo "$(date) :: $note" &gt;&gt; ~/.notes'</execute>
-      </action>
-    </keybind>
     <keybind key="232">
       <action name="Execute">
-        <execute>xbacklight -dec 7</execute>
+        <execute>sudo /usr/local/sbin/brightness -d</execute>
       </action>
     </keybind>
     <keybind key="233">
       <action name="Execute">
-        <execute>xbacklight -inc 7</execute>
+        <execute>/sudo usr/local/sbin/brightness -i</execute>
       </action>
     </keybind>
     <keybind key="W-d">
