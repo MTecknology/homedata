@@ -214,14 +214,19 @@
         <execute>terminator -u -m -b -T irssi -x ssh michael@irc.lustfield.net -t screen -aAdr -RR irssi irssi</execute>
       </action>
     </keybind>
-    <keybind key="232">
+    <keybind key="XF86MonBrightnessDown">
       <action name="Execute">
         <execute>sudo /usr/local/sbin/brightness -d</execute>
       </action>
     </keybind>
-    <keybind key="233">
+    <keybind key="XF86MonBrightnessUp">
       <action name="Execute">
-        <execute>/sudo usr/local/sbin/brightness -i</execute>
+        <execute>sudo /usr/local/sbin/brightness -i</execute>
+      </action>
+    </keybind>
+    <keybind key="XF86Display">
+      <action name="Execute">
+        <execute>/home/michael/.bin/monitor toggle</execute>
       </action>
     </keybind>
     <keybind key="W-d">
