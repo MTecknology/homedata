@@ -13,13 +13,13 @@ We build a custom undionly image which has an embedded initial script. This
 allows us to prevent boot loops while not needing any special configuration
 from the dhcp server.
 
-mtnet.ipxe:
+mtnet.ipxe::
 
     #!ipxe
     dhcp
     chain http://boot.lustfield.net/loader.ipxe
 
-To build the ipxe image:
+To build the ipxe image::
 
     sudo apt-get build-essential liblzma-dev git
     git clone git://git.ipxe.org/ipxe.git

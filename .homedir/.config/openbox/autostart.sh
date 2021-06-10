@@ -10,7 +10,7 @@ compton &
 feh --bg-scale /home/michael/.wallpaper.png &
 stalonetray -p --dockapp-mode &
 #redshift-gtk &
-pulseaudio &
+pulseaudio --start &
 #cbatticon &
 #mate-volume-control-applet &
 
@@ -20,5 +20,5 @@ pulseaudio &
 
 #(sleep 1 && rm -rf ~/.mozilla/firefox/*/{Cache,places.sqlite,places.sqlite-journal,urlclassifier3.sqlite,urlclassifierkey3.txt,XPC.mfasl,XUL.mfasl} ) &
 
-[ `/usr/bin/cksum '/home/michael/.bin/vault' | /usr/bin/cut -d ' ' -f 1` -eq '639895823' ] || /usr/bin/zenity --info --text='ALERT: vault cksum changed'
+[ `/usr/bin/cksum '/home/michael/.bin/vault' | /usr/bin/cut -d ' ' -f 1` -eq '3273804860' ] || /usr/bin/zenity --info --text='ALERT: vault cksum changed'
 #xbacklight -set 55 &
