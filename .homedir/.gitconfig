@@ -13,3 +13,5 @@
 	gpgsign = true
 [pull]
 	rebase = true
+[init]
+	defaultBranch = master

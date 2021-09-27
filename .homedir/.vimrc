@@ -29,6 +29,7 @@ set ttyfast
 set ruler
 set backspace=indent,eol,start
 set number
+set mouse=
 "set relativenumber
 set laststatus=2
 set history=1000

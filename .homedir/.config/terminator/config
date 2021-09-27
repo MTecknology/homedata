@@ -3,6 +3,7 @@
   handle_size = 1
   title_hide_sizetext = True
   title_transmit_bg_color = "#0c15000073f5"
+  title_receive_bg_color = "#1e90ff"
   inactive_color_offset = 1.0
   enabled_plugins = ,
   suppress_multiple_term_dialog = True
@@ -11,6 +12,7 @@
   go_down = <Super>Down
   go_left = <Super>Left
   go_right = <Super>Right
+  split_vert = <Primary><Shift>e
   hide_window = <Primary><Shift><Alt>v
   broadcast_off = <Shift><Super>g
   broadcast_group = <Primary><Shift>g
@@ -20,23 +22,23 @@
 [profiles]
   [[default]]
     allow_bold = False
-    background_color = "#300a24"
+    background_color = "#0b0d1c"
     background_darkness = 0.0
     cursor_blink = False
     cursor_color = "#b5b5b5"
     font = Monospace 10
-    foreground_color = "#b5b5b5"
+    foreground_color = "#deddda"
     scrollbar_position = hidden
     scrollback_infinite = True
-    palette = "#000000:#cd0000:#00cd00:#cdcd00:#6eb3d7:#cd00cd:#00cdcd:#e5e5e5:#4c4c4c:#ff0000:#00ff00:#ffff00:#4682b4:#b82adc:#4fcad2:#ffffff"
+    palette = "#181915:#dc5353:#5cff88:#f9f06b:#62a0ea:#9141ac:#42ffff:#deddda:#45473c:#e00265:#8ff0a4:#e6db74:#1d71ca:#feadff:#5cd1f8:#ffffff"
     use_system_font = False
   [[sunlight]]
-    background_color = "#fbf1c7"
+    background_color = "#ffffdc"
     cursor_blink = False
     cursor_color = "#000000"
     font = Monospace 10
     foreground_color = "#3c3836"
-    palette = "#555753:#cd0000:#4e9a06:#c4a000:#0000cd:#cd00cd:#00cdcd:#faebd7:#babdb6:#ff0000:#00cd00:#edd400:#0000ff:#ff00ff:#00ffff:#ffffff"
+    palette = "#9a9996:#830e0e:#4e9a06:#63452c:#0000cd:#c300bb:#1a5fb4:#77767b:#babdb6:#ff0000:#8ff0a4:#cdab8f:#0000ff:#c061cb:#62a0ea:#ffffff"
     use_system_font = False
 [layouts]
   [[default]]
