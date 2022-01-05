@@ -1,0 +1,29 @@
+# Note to self: Never buy a brother printer again... this is terrible
+
+##
+# Firmware Updates
+##
+
+https://support.brother.com/g/b/downloadlist.aspx?c=us&lang=en&prod=hll3290cdw_us&os=10068
+
+##
+# Scanner
+##
+
+https://support.brother.com/g/b/downloadlist.aspx?c=us&lang=en&prod=hll3290cdw_us&os=128
+
+Download:
+- Scanner driver 64bit (deb package)	
+- Scan-key-tool 64bit (deb package)	
+
+dpkg -i brscan*
+brsaneconfig4 -a name=print model=HL-3290CDW ip=10.41.3.80
+
+apt install simple-scan
+
+##
+# Printer
+##
+
+Driver:  Generic PostScript
+Address: ipp://prd-print-01.lustfield.net:631/postscript_p1
