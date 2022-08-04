@@ -21,7 +21,6 @@
   help = <Alt>F1
 [profiles]
   [[default]]
-    allow_bold = False
     background_color = "#0b0d1c"
     background_darkness = 0.0
     cursor_blink = False
