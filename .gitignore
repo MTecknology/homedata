@@ -6,7 +6,8 @@
 
 # Resume Stuff
 *.log
-output
+resume/latex/output
+resume/latex/cv.log
 
 # Python / Flask / Bottle / Vagrant Stuff
 _build
@@ -25,3 +26,6 @@ conf/*
 *.DS_Store
 .pytest_cache
 Pipfile.lock
+
+# Misc.
+*/keepassxc.ini
