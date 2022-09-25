@@ -29,3 +29,4 @@ Pipfile.lock
 
 # Misc.
 */keepassxc.ini
+.homedir/.config/autostart
