@@ -2,7 +2,7 @@
 alttab-switcher-delay=10
 alttab-switcher-style='icons'
 applet-cache-updated=1664068704
-command-history=['chromium', 'keepassxc']
+command-history=['keepassxc', 'steam', 'chromium', 'dconf-editor']
 desklet-snap-interval=25
 desktop-effects-close-effect='traditional'
 desktop-effects-close-time=120
@@ -24,20 +24,27 @@ desktop-effects-tile-transition='easeInQuad'
 desktop-effects-unmaximize-effect='none'
 desktop-effects-unmaximize-time=100
 desktop-effects-unmaximize-transition='easeNone'
+desktop-effects-workspace=false
+development-tools=false
+enable-app-monitoring=false
 enable-vfade=false
-enabled-applets=['panel1:left:0:menu@cinnamon.org:0', 'panel1:right:0:systray@cinnamon.org:3', 'panel1:right:2:xapp-status@cinnamon.org:4', 'panel1:right:3:notifications@cinnamon.org:5', 'panel1:right:0:removable-drives@cinnamon.org:7', 'panel1:right:4:keyboard@cinnamon.org:8', 'panel1:right:5:network@cinnamon.org:10', 'panel1:right:6:sound@cinnamon.org:11', 'panel1:right:7:power@cinnamon.org:12', 'panel1:center:0:calendar@cinnamon.org:13']
+enabled-applets=['panel1:left:0:menu@cinnamon.org:0', 'panel1:right:1:systray@cinnamon.org:3', 'panel1:right:2:xapp-status@cinnamon.org:4', 'panel1:right:3:notifications@cinnamon.org:5', 'panel1:right:5:removable-drives@cinnamon.org:7', 'panel1:right:4:keyboard@cinnamon.org:8', 'panel1:right:6:network@cinnamon.org:10', 'panel1:right:7:sound@cinnamon.org:11', 'panel1:center:0:calendar@cinnamon.org:13', 'panel1:right:9:sessionManager@scollins:15', 'panel1:right:8:power@cinnamon.org:16']
 enabled-desklets=@as []
 hotcorner-layout=['expo:false:0', 'scale:false:0', 'scale:false:0', 'desktop:false:0']
-next-applet-id=14
+next-applet-id=17
 no-adjacent-panel-barriers=false
 panel-edit-mode=false
 panel-zone-symbolic-icon-sizes='[{"panelId": 1, "left": 28, "center": 28, "right": 16}]'
 panels-enabled=['1:0:top']
 panels-height=['1:40']
 startup-animation=false
+window-effect-speed=1
 
 [cinnamon-session]
+debug=false
+prefer-hybrid-sleep=true
 quit-time-delay=60
+x-sync=false
 
 [desktop/a11y/keyboard]
 bouncekeys-delay=300
@@ -77,7 +84,7 @@ text-scaling-factor=1.0
 toolkit-accessibility=true
 
 [desktop/keybindings]
-custom-list=['__dummy__', 'custom0']
+custom-list=['__dummy__', 'custom0', 'custom1', 'custom2', 'custom3']
 looking-glass-keybinding=@as []
 magnifier-zoom-in=@as []
 magnifier-zoom-out=@as []
@@ -88,14 +95,31 @@ binding=['<Super>i']
 command='terminator -m -T irssi -x ssh michael@irc.lustfield.net -t screen -aAdr -RR irssi irssi'
 name='IRC'
 
+[desktop/keybindings/custom-keybindings/custom1]
+binding=['<Super>t']
+command='terminator'
+name='Terminal'
+
+[desktop/keybindings/custom-keybindings/custom2]
+binding=['<Super>f']
+command='firefox'
+name='Web Browser'
+
+[desktop/keybindings/custom-keybindings/custom3]
+binding=['<Super>c']
+command='claws-mail'
+name='Email'
+
 [desktop/keybindings/media-keys]
-email=['<Super>c']
+calculator=@as []
+email=@as []
+home=['XF86Explorer']
 restart-cinnamon=@as []
 screensaver=['<Super>l', 'XF86ScreenSaver']
 search=['<Shift><Super>question', '<Super>slash']
 shutdown=['XF86PowerOff']
-terminal=['<Super>t']
-www=['<Super>f']
+terminal=@as []
+www=@as []
 
 [desktop/keybindings/wm]
 begin-move=@as []
@@ -116,27 +140,66 @@ switch-to-workspace-down=@as []
 switch-to-workspace-up=@as []
 unmaximize=@as []
 
+[desktop/lockdown]
+disable-application-handlers=false
+disable-command-line=false
+disable-user-switching=true
+
 [desktop/media-handling]
+automount=false
+automount-open=true
+autoprompt-never=true
 autorun-never=false
+
+[desktop/peripherals/keyboard]
+delay=uint32 500
+numlock-state=true
+repeat-interval=uint32 30
+
+[desktop/peripherals/mouse]
+double-click=335
+drag-threshold=8
+natural-scroll=false
+speed=0.0
+
+[desktop/peripherals/touchpad]
+disable-while-typing=false
+natural-scroll=false
+speed=0.26681127982646413
 
 [desktop/privacy]
 remember-recent-files=false
 
 [desktop/screensaver]
+allow-keyboard-shortcuts=false
 allow-media-control=false
-lock-delay=uint32 15
+idle-activation-enabled=true
+lock-delay=uint32 10
+lock-enabled=true
+show-album-art=false
+show-clock=true
+show-info-panel=true
+show-notifications=false
 use-custom-format=false
+
+[desktop/session]
+idle-delay=uint32 600
+session-daemon-uses-logind=true
+session-name='cinnamon'
+settings-daemon-uses-logind=true
 
 [desktop/sound]
 event-sounds=false
 
 [desktop/wm/preferences]
 button-layout=':minimize,maximize,close'
+focus-new-windows='smart'
 min-window-opacity=30
 num-workspaces=3
 
 [muffin]
 desktop-effects=false
+draggable-border-width=10
 edge-tiling=true
 placement-mode='automatic'
 resize-threshold=24
@@ -144,6 +207,7 @@ tile-hud-threshold=25
 
 [settings-daemon/peripherals/keyboard]
 delay=uint32 500
+numlock-state='on'
 repeat-interval=uint32 30
 
 [settings-daemon/peripherals/mouse]
@@ -155,14 +219,24 @@ motion-threshold=1
 motion-threshold=1
 
 [settings-daemon/plugins/power]
-critical-battery-action='shutdown'
+button-hibernate='hibernate'
+button-power='suspend'
+button-suspend='suspend'
+critical-battery-action='hibernate'
 idle-dim-battery=false
+inhibit-lid-switch=true
 lid-close-ac-action='suspend'
 lid-close-battery-action='suspend'
+lock-on-suspend=true
+percentage-action=3
+percentage-critical=5
+percentage-low=10
 sleep-display-ac=1800
 sleep-display-battery=1800
 sleep-inactive-ac-timeout=0
 sleep-inactive-battery-timeout=7200
+time-critical=600
+time-low=1200
 
 [theme]
 name='Blue-Submarine'
