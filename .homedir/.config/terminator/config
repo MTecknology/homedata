@@ -1,9 +1,6 @@
 [global_config]
   dbus = False
   handle_size = 0
-  title_hide_sizetext = True
-  title_transmit_bg_color = "#0c15000073f5"
-  title_receive_bg_color = "#1e90ff"
   inactive_color_offset = 1.0
   enabled_plugins = ,
   suppress_multiple_term_dialog = True
@@ -14,27 +11,30 @@
   go_right = <Super>Right
   split_vert = <Primary><Shift>e
   hide_window = <Primary><Shift><Alt>v
+  group_all = ""
   broadcast_off = <Shift><Super>g
-  broadcast_group = <Primary><Shift>g
-  broadcast_all = <Super>g
+  broadcast_group = <Super>g
+  broadcast_all = <Primary><Super>g
   layout_launcher = <Primary><Shift><Alt>l
   help = <Alt>F1
 [profiles]
   [[default]]
-    background_color = "#0b0d1c"
+    background_color = "#300a24"
     background_darkness = 0.0
     cursor_blink = False
-    cursor_color = "#b5b5b5"
+    cursor_fg_color = "#0b0d1c"
+    cursor_bg_color = "#deddda"
+    cursor_color_default = False
     font = Monospace 10
-    foreground_color = "#deddda"
+    foreground_color = "#ffffff"
     scrollbar_position = hidden
     scrollback_infinite = True
     palette = "#181915:#dc5353:#5cff88:#f9f06b:#62a0ea:#9141ac:#42ffff:#deddda:#45473c:#e00265:#8ff0a4:#e6db74:#1d71ca:#feadff:#5cd1f8:#ffffff"
     use_system_font = False
+    title_transmit_bg_color = "#1a5fb4"
   [[sunlight]]
     background_color = "#ffffdc"
     cursor_blink = False
-    cursor_color = "#000000"
     font = Monospace 10
     foreground_color = "#3c3836"
     palette = "#9a9996:#830e0e:#4e9a06:#63452c:#0000cd:#c300bb:#1a5fb4:#77767b:#babdb6:#ff0000:#8ff0a4:#cdab8f:#0000ff:#c061cb:#62a0ea:#ffffff"

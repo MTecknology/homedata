@@ -1,11 +1,9 @@
-[ssh.upload.debian.org]
-fqdn = ssh.upload.debian.org
-method = sftp
+[ssh-upload]
 login = mtecknology
-run_dinstall = 0
-progress_indicator = 2
-allow_insinged_uploads = 0
-incoming = /srv/upload.debian.org/UploadQueue
+fqdn = ssh.upload.debian.org
+method = scp
+incoming = /srv/upload.debian.org/UploadQueue/
+allow_dcut = 1
 
 #[ssh.security.upload.debian.org]
 #fqdn = ssh://ssh.security.upload.debian.org/srv/security.upload.debian.org/SecurityUploadQueue
