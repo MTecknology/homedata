@@ -6,4 +6,4 @@ against remote endpoints, similar to https://toolbox.googleapps.com/.
 
 Dependencies::
 
-    apt install python3-bottle
+    apt install  python3-bottle  bind9-dnsutils iperf3 iputils-ping
