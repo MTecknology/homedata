@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Net Tools</title>
+  <meta name="keywords" content="web, tools, dig, ping, iperf" />
+  <meta name="description" content="web-based troubleshooting tools" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+  <link rel="shortcut icon" href="/static/favicon.ico" type="image/vnd.microsoft.icon" />
+  <link type="text/css" rel="stylesheet" href="/static/site.css" media="all" />
+  <script type="text/javascript" src="/static/site.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Networking Toolbox</h1>
+
+    <div class="tabs">
+      <button id="dig_tab" class="tab_links" onclick="open_tab('dig')">Dig</button>
+      <button id="iperf_tab" class="tab_links" onclick="open_tab('iperf')">Iperf</button>
+      <button id="ping_tab" class="tab_links" onclick="open_tab('ping')">Ping</button>
+    </div>
+
+    <!-- TAB: dig -->
+    <div id="dig" class="tab_content">
+      <h2>Perform a DNS query against specified deviece</h2>
+      <form action="/" method="post">
+        <label for="dig_target">Target IP/Hostname:</label>
+        <input type="text" id="dig_target" name="target" placeholder="e.g. example.com" required>
+
+        <label for="record_type">Record Type:</label>
+        <select id="record_type" name="record_type">
+          <option value="A">A (IPv4 Address)</option>
+          <option value="AAAA">AAAA (IPv6 Address)</option>
+          <option value="CNAME">CNAME (Canonical Name)</option>
+          <option value="MX">MX (Mail Exchange)</option>
+          <option value="NS">NS (Name Server)</option>
+          <option value="TXT">TXT (Text Records)</option>
+        </select>
+
+        <label for="dig_server">DNS Server:</label>
+        <select id="dig_server" name="dig_server">
+          <option value="10.200.10.21">10.200.10.21 (Internal DNS 1)</option>
+          <option value="10.200.10.22">10.200.10.22 (Internal DNS 2)</option>
+          <option value="10.200.10.23">10.200.10.23 (Internal DNS 3)</option>
+          <option value="1.1.1.1">1.1.1.1 (Cloudflare DNS)</option>
+        </select>
+
+        <button name="operation" type="submit" value="dig">Perform Dig</button>
+      </form>
+    </div>
+
+    <!-- TAB: iperf -->
+    <div id="iperf" class="tab_content">
+      <h2>Performance test against a specified device</h2>
+      <form action="/" method="post">
+        <label for="iperf_target">Target IP/Hostname:</label>
+        <input type="text" id="iperf_target" name="target" placeholder="e.g. 192.168.1.1" required>
+
+        <label for="iperf_port">Port:</label>
+        <input type="number" id="iperf_port" name="port" value="5201" min="1024" max="65535">
+
+        <label for="iperf_time">Test Duration (seconds):</label>
+        <input type="number" id="iperf_time" name="duration" value="15" min="1" max="90">
+
+        <p>Ensure remote end has been prepared, using: <b>iperf3 -s -p 5201</b></p>
+        <button name="operation" type="submit" value="iperf">Run Iperf Test</button>
+      </form>
+    </div>
+
+    <!-- TAB: ping -->
+    <div id="ping" class="tab_content">
+      <h2>Send an ICMP Echo request to specified deviece</h2>
+      <form action="/" method="post">
+        <label for="ping_target">Target IP/Hostname:</label>
+        <input type="text" id="ping_target" name="target" placeholder="e.g. example.com" required>
+
+        <label for="ping_count">Count:</label>
+        <input type="number" id="ping_count" name="ping_count" value="4" min="1" max="100">
+
+        <button name="operation" type="submit" value="ping">Perform Ping</button>
+      </form>
+    </div>
+
+    <!-- TAB: default -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        % if defined('tab'):
+        open_tab("{{ tab }}");
+        % else:
+        open_tab("dig");
+        % end
+      });
+    </script>
+
+    <!-- RESULTS -->
+    % if defined('results'):
+    <h2>Results:</h2>
+    <pre>{{ results }}</pre>
+    % end
+
+  </div>
+</body>
+</html>
