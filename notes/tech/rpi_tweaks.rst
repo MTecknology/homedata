@@ -1,0 +1,21 @@
+RasPi 3
+=======
+
+Configuration worth remembering to apply on all RasPi 3 devices.
+
+/etc/modprobe.d/raspi-blacklist.conf::
+
+    # wifi
+    blacklist brcmfmac
+    blacklist brcmutil
+    blacklist bcm2835_wdt
+
+    # bt
+    blacklist btbcm
+    blacklist hci_uart
+
+    # sound
+    blacklist snd_bcm2835
+    blacklist snd_pcm
+    blacklist snd_timer
+    blacklist snd

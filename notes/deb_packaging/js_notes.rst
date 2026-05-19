@@ -1,0 +1,24 @@
+Javascript Libraries
+====================
+
+.. code-block:: sh
+
+   npm2deb create <foo>
+   cd <foo>/<foo>-<ver>/
+   rm ../*<ver>*
+   vim debian/copyright
+     Files-Excluded: dist/* test
+   git init
+   uscan --force-download
+   gbp import-orig ../*.orig.tar.gz
+   pristine-tar commit ../*.orig.tar.gz
+   git add debian
+   git clean -fxd
+   echo demo >debian/examples
+   vim debian/*:
+     debian/compat:
+       10
+     debian/control:
+       Build-Depends: clean-up, compat=10
+       SV: 4.1.1
+       Depends: clean up

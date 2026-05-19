@@ -7,7 +7,7 @@ salt-cloud:
       size: 512MB
     proxint:
       image: slowdisk:vztmpl/debian-8.0_Lustfield.tar.gz
-      disk: slow;8
+      disk: "slow;8"
       type: lxc 
       host: prox1
       onboot: 1
@@ -36,25 +36,25 @@ salt-cloud:
   proxint-nodes:
 
     forge.domain.tld:
-      id: 210;forge
+      id: "210;forge"
       type: qemu
       mem: 256-8192
       cpu: 16
-      disk: slow;64
+      disk: "slow;64"
       iface:
         net0:
           name: eth0
           vlan: 2
 
-    {## 
-     # PROD
-     ##}
+    ## 
+    # PROD
+    ##
 
     boot.domain.tld:
-      id: 101;boot
+      id: "101;boot"
       mem: 512 
       cpu: 1
-      disk: fast;8
+      disk: "fast;8"
       iface:
         net0:
           name: eth0
@@ -63,10 +63,10 @@ salt-cloud:
           ipv4_gw: 10.41.57.1
 
     salt.domain.tld:
-      id: 111;salt
+      id: "111;salt"
       mem: 2048
       cpu: 8
-      disk: crypt;16
+      disk: "crypt;16"
       iface:
         net0:
           name: eth0
@@ -77,10 +77,10 @@ salt-cloud:
           ipv6_gw: 2001:dead:b33f:50::1
 
     git.domain.tld:
-      id: 112;git
+      id: "112;git"
       mem: 2048
       cpu: 4
-      disk: crypt;32
+      disk: "crypt;32"
       iface:
         net0:
           name: eth0
@@ -91,9 +91,9 @@ salt-cloud:
           ipv6_gw: 2001:dead:b33f:50::1
 
     log.domain.tld:
-      id: 113;log
+      id: "113;log"
       mem: 512
-      disk: crypt;64
+      disk: "crypt;64"
       iface:
         net0:
           name: eth0
@@ -104,9 +104,9 @@ salt-cloud:
           ipv6_gw: 2001:dead:b33f:50::1
 
     apt.domain.tld:
-      id: 114;apt
+      id: "114;apt"
       mem: 1024
-      disk: fast;16
+      disk: "fast;16"
       iface:
         net0:
           name: eth0
@@ -116,4 +116,4 @@ salt-cloud:
           ipv6_addr: 2001:dead:b33f:50::14/64
           ipv6_gw: 2001:dead:b33f:50::1
 
-    [...]
+    #[...]

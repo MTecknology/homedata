@@ -1,0 +1,57 @@
+Sauerkraut
+==========
+
+First Attempt
+-------------
+
+Unfortunately, this recipe was lost.
+It was flavorful and tasty. :(
+
+Second Attempt
+--------------
+
+Base:
+
+  ======  =======================
+  8.6 lb  red/green cabbage (73%)
+  3.2 lb  fennel bulbs (27%)
+  ======  =======================
+
+Salt:
+
+  .. code-block:: text
+
+     ((8.6 + 3.2) * 453.592) * 0.015 = 80.3
+     80.3 grams finely ground salt
+
+Seasoning (per ~10 lb):
+
+  ======  =======================
+  1 Tbsp  juniper berries
+  2 Tbsp  caraway seeds
+  2 tsp   aniseed
+  2 tsp   celery seeds
+  ======  =======================
+
+Mix salt and seasonings
+
+- Finely slice cabbage/fennel
+- Create layers of salt and sliced cabbage
+- Press down firmly
+- Let rest for at least 30 minutes
+
+  + good time to clean
+
+- Punch 'n mash the cabbage/salt mixture
+- Ensure cabbage is submerged below brine
+
+- Wait 3+ weeks (active CO2 for the first 3-5 days)
+- Check occasionally to ensure brine is above cabbage
+
+  + a 5 gallon bucket, typical dinner plate, and weight are excellent for this
+
+Results
+-------
+
+It's definitely not as good as the first attempt, but still very good.
+It needs more fennel and some black pepper.

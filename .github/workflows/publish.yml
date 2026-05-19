@@ -1,0 +1,35 @@
+name: Publish Update
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  docs:
+    name: Update Sphinx Site
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+
+      - name: Clone Repository
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-sphinx python3-sphinx-rtd-theme
+
+      - name: Build Site
+        run: make html
+
+      - name: Upload Site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_build/html
+
+      - name: Publish Site
+        uses: actions/deploy-pages@v4

@@ -1,7 +1,7 @@
-iPXE
-====
+iPXE Boot
+=========
 
-It turns out, ipxe is an amazing thing. Because the firmware is so easy to
+It turns out, iPXE is an amazing thing. Because the firmware is so easy to
 build, we can create a simple script embedded into the ipxe boot image and
 share that with all devices. Instead of a big pile of stuff served over the
 junky tftp protocol, we can just serve one single 64k file.

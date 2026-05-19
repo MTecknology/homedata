@@ -7,7 +7,9 @@
 ""
 
 " Wrap RST at 80 chars
-autocmd BufEnter,BufRead *.rst syn on | set syntax=rst | set tw=80 | set wrap
+autocmd BufEnter,BufRead *.rst syn on | set syntax=rst | set tw=80
+autocmd BufEnter,BufRead *.tex syn on | set sw=2 | set expandtab
+autocmd BufEnter,BufRead *.sty syn on | set sw=2 | set expandtab
 
 " Salt States
 "autocmd BufEnter,BufRead *.sls syn on | set syntax=yaml
@@ -18,6 +20,7 @@ filetype plugin indent on
 " Basic Options
 ""
 
+set wrap
 set encoding=utf-8
 set modelines=0
 set autoindent

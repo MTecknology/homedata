@@ -1,0 +1,52 @@
+Kayaking Checklist
+==================
+
+Gotta remember all this stuff for every trip.
+
+- Kayak
+- Paddle
+- Extra paddle
+- Life jacket
+- Sun glasses
+- Kayaking gloves
+- Hat
+- Sidearm & extra clip
+- Hatchet
+- Flint & Steel
+- Fishing Rod
+- Fillet knife
+- Hunting knife
+- Tackle
+- Stringer
+- Dry bag (x2)
+- Sun screen
+- Water bottle (life water)
+- Toilet paper
+- Mason line
+- Clothes
+- GPS w/ public areas (extra batteries)
+- Licenses (CCW, Fishing, DL)
+- Chapstick
+- Ibuprofen
+- Towel
+- Bailer w/ hose
+- Compass
+- Shampoo
+- Tooth brush/paste
+- Small tent
+- Bug spray
+- Tin foil
+
+Emergency Things
+----------------
+
+- First aid kit (including suters)
+- Water purification
+- Granola Bars
+- Matches/Lighter
+- Cell phone
+- Cell phone battery pack
+- Flashlight
+- Bivvy
+- Mylar e-blanket
+- Matches
