@@ -1,33 +1,38 @@
 Employer Research
 =================
 
-Critical Interrogation Questions
---------------------------------
+.. toctree::
+   :glob:
+   :hidden:
+   :maxdepth: 3
 
-Always be ready to answer these questions!
+   /.private/work/research/*
+   research_template.rst
 
-**Why do I want to leave ____?** (most common reason)
+.. _job-ko:
 
-  This is a difficult question, because I've been able to accomplish a lot in a
-  short time. Unfortunately, any major projects have been wrapped up, all the
-  automation and clean-up efforts are complete, documentation is written, backups
-  are regularly verified.
-  At this point, I mostly just review system logs and wait for something to
-  break.
+Knockout Criteria
+-----------------
 
-**I see you work for XCorp, but your application lists YCorp; can you explain that?**
+This is my most important criterion when considering a position:
 
-  They're owned by the same parent company and share staff.
-  I was hired because XCorp needed to terminate the entire system admin team and
-  they needed someone who was able to quickly identify critical systems and take
-  over support.
-  ... Personally, my goal is always to keep documentation a priority; and then
-  those situations can't exist.
+- What service is used to provide Auth+SSO (O365, Google, LLNG, Okta, etc.)?
+- Describe the worst outage, at this company, that you were a part of. 
+   + What was your role in the recovery effort?
+   + What was the root cause, and how was the problem addressed?
+- How heavily is LLM used in daily work?
+- Describe how you interact with tickets, and keep track of your progress.
+- How much of your day is spent contributing to a git repository?
+- Describe the current state of documentation.
+- What will success look like at the end of 6 months and 1 year?
+- What is the typical work pace and task saturation?
 
+HR:
 
-Critical Company Questions
---------------------------
+- How is health insurance handled (stipened, BC/BS, etc.)?
 
-Never forget to ask these questions!
+Other good questions, if time permits:
 
-**In your opinion, what is the difference between a junior and a senior engineer?**
+- Can you describe your opinion of the difference between a junior and senior engineer?
+- Bring your own device or company-provided/-managed?
+- What was your most challenging project at this current role?

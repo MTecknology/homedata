@@ -1,6 +1,92 @@
 Personal Position
 =================
 
+- `My Résumé <https://resume.lustfield.net>`__
+- `My CV (Curriculum Vitae) <https://cv.lustfield.net>`__
+
+
+Hirecarta Summary
+-----------------
+
+Copy/paste from `Hirecarta AI (Career Guide) <https://hirecarta.com/>`__
+
+Career Path
+~~~~~~~~~~~
+
+**Career Track**:
+
+.. code-block:: text
+
+   Individual Contributor (IC) in Systems Engineering & DevOps with strong
+   technical leadership and open-source influence. Transitioning toward senior
+   technical leadership (e.g., Principal Engineer, Staff Engineer, or DevOps
+   Architect), with demonstrated cross-functional impact in security, automation,
+   and infrastructure resilience.
+
+**Experience Level**
+
+.. code-block:: text
+
+   Senior to Executive-Level Technical Expert (15+ years of progressive systems
+   engineering and infrastructure leadership). Current role reflects
+   Principal-level responsibilities despite title of 'Senior Systems Engineer'.
+
+**Progression Pattern**
+
+.. code-block:: text
+
+   Began in application development and system administration (early 2000s),
+   evolved into automation-focused DevOps and SRE roles by mid-2010s. Consistently
+   advanced into higher-complexity environments (SMB → enterprise → hyperscale).
+   Demonstrates a pattern of joining organizations during technical debt crises
+   and leading stabilization, modernization, and automation initiatives.
+
+**Transferable Skills**
+
+   - Infrastructure automation (Ansible, SaltStack, Chef)
+   - Security compliance and hardening (CIS, HIPAA, PCI-DSS, GDPR)
+   - Incident response and disaster recovery leadership
+   - Cross-functional stakeholder collaboration (developers, network engineers, security teams)
+   - Documentation and knowledge management at scale
+   - Open-source contribution and community leadership
+   - End-user experience design in secure environments
+   - CI/CD integration for infrastructure and configuration changes
+
+Next Career Moves
+~~~~~~~~~~~~~~~~~
+
+**Principal Systems Engineer (Ready now)**
+
+.. code-block:: text
+
+   A natural vertical move given your current responsibilities at Utah Broadband
+   and past leadership in incident response, automation, and cross-team
+   coordination. You already operate at this level.
+
+**DevOps Architect (Ready now)**
+
+.. code-block:: text
+
+   Leverages your automation, security, and compliance expertise in a strategic
+   role. Your work at Sony, Volkswagen, and Juniper shows you can define and
+   enforce enterprise-wide standards.
+
+**Staff Systems Engineer (Ready now)**
+
+.. code-block:: text
+
+   Your open-source leadership, documentation excellence, and mentoring passion
+   make you ideal for a Staff Engineer role focused on platform enablement and
+   technical guidance.
+
+**Head of Secure AI/ML Infrastructure  (1-2 years)**
+
+.. code-block:: text
+
+   A lateral move with strategic growth potential. Your security automation,
+   compliance tooling, and IRB experience position you well for a role shaping
+   ethical and secure AI infrastructure.
+
 SFIA Skills Matrix
 ------------------
 

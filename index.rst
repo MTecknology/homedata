@@ -35,8 +35,9 @@ MTeck's Random Stuff
    :maxdepth: 3
    :caption: Employment
 
+   work/position
    work/research
-   work/portfolio
+   .private/work/interview
 
 .. toctree::
    :hidden:

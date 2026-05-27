@@ -4,6 +4,10 @@ Personal collection of random bits, with a sphinx-doc cover.
 
 Build Dependencies: python3-sphinx python3-sphinx-rtd-theme
 '''
+import os
+
+
+# Project Options
 project = 'Home Data'
 author = 'Michael Lustfield (MTecknology)'
 copyright = '2026, Michael Lustfield'
